@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../Slice/cartSlice";
 import { Link } from "react-router-dom";
@@ -6,8 +6,6 @@ import { Pagination } from "flowbite-react";
 import { CgMenuGridR } from "react-icons/cg";
 import { FaCartPlus } from "react-icons/fa";
 import { Breadcrumb } from "flowbite-react";
-import { fetchAllProducts } from "../../Slice/products";
-import Spinner from "../Spinner/Spinner";
 const Products = React.memo(() => {
   const [currentPage, setCurrentPage] = useState(1);
   const onPageChange = (page) => setCurrentPage(page);

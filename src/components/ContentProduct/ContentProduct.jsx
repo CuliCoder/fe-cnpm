@@ -110,15 +110,15 @@ export default function ContentProduct() {
               <div
                 className="flex items-center px-8 py-3 bg-orange-500 text-white gap-2 cursor-pointer  hover:bg-slate-900 duration-200"
                 onClick={() => {
-                  if (currentProduct.length > 0) {
+                  if (currentProduct) {
                     dispatch(
                       addProduct({
-                        id: currentProduct[0].id,
-                        name: currentProduct[0].title,
-                        price: currentProduct[0].price,
+                        id: currentProduct.id,
+                        name: currentProduct.title,
+                        price: currentProduct.price,
                         quantity: quantity,
-                        total: currentProduct[0].price * quantity,
-                        thumbnail: currentProduct[0].thumbnail,
+                        total: currentProduct.price * quantity,
+                        thumbnail: currentProduct.thumbnail,
                       })
                     );
                   }

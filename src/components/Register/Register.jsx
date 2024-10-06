@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../../config/configAxios.js";
 import "./Register.css";
-import { validEmail } from "../regex.js";
 import { useDispatch, useSelector } from "react-redux";
 import * as registerAction from "../../Slice/registerSlice.js";
 import { clearState } from "../../Slice/registerSlice.js";
@@ -12,11 +10,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [emailErr, setEmailErr] = useState(false);
-  const [haveCode, setHaveCode] = useState(true);
   const [code, setCode] = useState("");
-  const [codeInEmail, setCodeInEmail] = useState("");
-  const [flag, setFlag] = useState(false);
-  const [flagPass, setFlagPass] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const getCode = useSelector((state) => state.register.getCode);

@@ -21,7 +21,6 @@ export default function MyAccount() {
   const [address, setAddress] = useState(false);
   const [infoAccount, setInfoAccount] = useState(false);
   const [info, setInfo] = useState([]);
-  const [allOrder, setAllOrder] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

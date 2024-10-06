@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext } from "react";
+import React from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -15,8 +15,7 @@ import Layout from "./components/Layout/Layout.js";
 import Products from "./components/Products/Products.jsx";
 import Payment from "./components/Checkout/Checkout.jsx";
 import SearchProduct from "./components/SearchProduct/SearchProduct.jsx";
-import Product_category from "./components/Product_category/Product_category.js";
-// import newProduct from "./components/newProduct.jsx";
+import Product_category from "./components/Product_category/Product_category.jsx";
 function App() {
   return (
     <Provider store={store}>
