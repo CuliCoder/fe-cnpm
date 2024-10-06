@@ -12,6 +12,7 @@ import { FaTachometerAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../Slice/status";
 import { setIsLogin } from "../../Slice/loginSlice";
+import { fetchInfoUser, fetchOrderUser } from "../../Slice/userSlice";
 import "./MyAccount.css";
 
 export default function MyAccount() {
@@ -28,6 +29,8 @@ export default function MyAccount() {
   const [password, setPassword] = useState("");
   const [rePass1, setRePass1] = useState("");
   const [rePass2, setRePass2] = useState("");
+  const userInfo = useSelector((state) => state.user.information);
+  const allOrderUser = useSelector((state) => state.user.order);
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -38,23 +41,8 @@ export default function MyAccount() {
   };
 
   useEffect(() => {
-    const getInfoAccount = async (user_id) => {
-      try {
-        const res = await axios.post(
-          "http://localhost/WriteResfulAPIPHP/api/user/getUserById.php",
-          { user_id: user_id }
-        );
-
-        setInfo(res.data);
-
-        const resOrder = await axios.post(
-          "http://localhost/WriteResfulAPIPHP/api/user/getAllOrder.php",
-          { user_id: user_id }
-        );
-        setAllOrder(resOrder.data);
-      } catch (error) {}
-    };
-    getInfoAccount(localStorage.getItem("id"));
+    dispatch(fetchInfoUser());
+    dispatch(fetchOrderUser());
   }, []);
 
   const handleChangeInfo = () => {
@@ -192,9 +180,17 @@ export default function MyAccount() {
             {account && (
               <div>
                 <p>
-                  Xin chào <strong>{info.fullname}</strong> (không phải tài
-                  khoản <strong>{info.fullname}</strong>? Hãy thoát ra và đăng
-                  nhập vào tài khoản của bạn)
+                  Xin chào{" "}
+                  <strong>
+                    {userInfo.info &&
+                      (userInfo.info.fullname || userInfo.info.email)}
+                  </strong>{" "}
+                  (không phải tài khoản{" "}
+                  <strong>
+                    {userInfo.info &&
+                      (userInfo.info.fullname || userInfo.info.email)}
+                  </strong>
+                  ? Hãy thoát ra và đăng nhập vào tài khoản của bạn)
                 </p>
                 <p className="mt-3">
                   Từ trang quản lý tài khoản bạn có thể xem đơn hàng mới, quản
@@ -205,7 +201,7 @@ export default function MyAccount() {
             )}
 
             {order &&
-              (allOrder.length <= 0 ? (
+              (allOrderUser.orders.length <= 0 ? (
                 <div className="pt-10">
                   <p className="text-4xl font-extrabold">Orders</p>
                   <div className="flex justify-between items-center border-t-[#fd6e4f] border-t-4 w-full h-[70px] mt-2 bg-[#f7f6f7] p-3">
@@ -226,21 +222,22 @@ export default function MyAccount() {
               ) : (
                 <div>
                   <Accordion collapseAll>
-                    {allOrder.map((order) => (
+                    {allOrderUser.orders.map((order) => (
                       <Accordion.Panel>
                         <Accordion.Title className="flex items-center justify-between">
-                          <div>Đơn hàng có mã {order.orderId}</div>
-                          <div>Ngày đặt: {order.orderDate}</div>
+                          <div>Đơn hàng có mã {order.id}</div>
+                          <div>Ngày đặt: {order.order_date}</div>
                         </Accordion.Title>
                         <Accordion.Content>
                           <div>
                             <div>
-                              <div>Mã đơn: {order.orderId}</div>
-                              {order.products.map((product) => (
-                                <div className="flex items-center justify-between ">
-                                  <p className="font-bold">
-                                    {product.productName}
-                                  </p>
+                              <div>Mã đơn: {order.id}</div>
+                              {order.order_detail.map((product) => (
+                                <div
+                                  className="flex items-center justify-between "
+                                  key={product.id}
+                                >
+                                  <p className="font-bold">{product.name}</p>
                                   <p>Đơn giá: {product.unitPrice}</p>
                                   <p>x{product.quantity}</p>
                                   <p>
@@ -254,7 +251,7 @@ export default function MyAccount() {
                               ))}
                             </div>
                             {
-                              (order.status = 2 ? (
+                              (order.status === 2 ? (
                                 <Badge
                                   color="warning"
                                   className="w-[100px] mt-2 ml-[90%]"

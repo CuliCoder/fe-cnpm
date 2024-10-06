@@ -4,6 +4,8 @@ import productReducer from "./Slice/products.js";
 import loginReducer from "./Slice/loginSlice.js";
 import statusReducer from "./Slice/status.js";
 import categoryReducer from "./Slice/categorySlice.js";
+import registerReducer from "./Slice/registerSlice.js";
+import userReducer from "./Slice/userSlice.js";
 export default configureStore({
   reducer: {
     cart: cartReducer,
@@ -11,5 +13,7 @@ export default configureStore({
     login: loginReducer,
     status: statusReducer,
     category: categoryReducer,
+    register: registerReducer,
+    user: userReducer,
   },
 });
