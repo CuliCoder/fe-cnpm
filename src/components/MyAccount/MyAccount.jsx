@@ -101,6 +101,7 @@ export default function MyAccount() {
             <Sidebar.Items>
               <Sidebar.ItemGroup>
                 <Sidebar.Item
+                  href="#"
                   icon={FaTachometerAlt}
                   onClick={() => {
                     setAccount(true);
@@ -112,6 +113,7 @@ export default function MyAccount() {
                   Trang tài khoản
                 </Sidebar.Item>
                 <Sidebar.Item
+                  href="#"
                   icon={HiViewBoards}
                   labelColor="dark"
                   onClick={() => {
@@ -127,6 +129,7 @@ export default function MyAccount() {
                   Mã giảm giá
                 </Sidebar.Item>
                 <Sidebar.Item
+                  href="#"
                   icon={IoLocation}
                   onClick={() => {
                     setOrder(false);
@@ -138,6 +141,7 @@ export default function MyAccount() {
                   Địa chỉ
                 </Sidebar.Item>
                 <Sidebar.Item
+                  href="#"
                   icon={HiUser}
                   onClick={() => {
                     setOrder(false);
@@ -250,23 +254,21 @@ export default function MyAccount() {
                                 </div>
                               ))}
                             </div>
-                            {
-                              (order.status === 2 ? (
-                                <Badge
-                                  color="warning"
-                                  className="w-[100px] mt-2 ml-[90%]"
-                                >
-                                  Chờ xác nhận
-                                </Badge>
-                              ) : (
-                                <Badge
-                                  color="success"
-                                  className="w-[100px] mt-2 ml-[90%]"
-                                >
-                                  Đã giao hàng
-                                </Badge>
-                              ))
-                            }
+                            {order.status === 2 ? (
+                              <Badge
+                                color="warning"
+                                className="w-[100px] mt-2 ml-[90%]"
+                              >
+                                Chờ xác nhận
+                              </Badge>
+                            ) : (
+                              <Badge
+                                color="success"
+                                className="w-[100px] mt-2 ml-[90%]"
+                              >
+                                Đã giao hàng
+                              </Badge>
+                            )}
 
                             <p className="text-2xl font-normal mt-5 ml-[70%]">
                               Tổng tiền:
