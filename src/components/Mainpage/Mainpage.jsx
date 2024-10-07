@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { FaCartPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./Mainpage.css";
@@ -9,8 +9,8 @@ import rightBottomBanner from "../../Images/Banner/rightBottom.jpg";
 import chieuHoangKi from "../../Images/Banner/ChieuHoangKi.jpg";
 import tarotKieu from "../../Images/Banner/tarotKieu.jpg";
 import thunhoibong from "../../Images/Banner/thunhoibongvang.jpg";
-import { useDispatch, useSelector } from "react-redux";
-import Spinner from "../Spinner/Spinner"; 
+import { useSelector } from "react-redux";
+import { formatPrice } from "../../config/formatPrice";
 export default function () {
   const { newProducts, byCategory1, byCategory2 } = useSelector(
     (state) => state.products.products_mainpage
@@ -85,7 +85,9 @@ export default function () {
                   <p className="mt-[40px] font-normal w-full mb-5">
                     {product.title}
                   </p>
-                  <span className="font-medium my-4">{product.price}₫</span>
+                  <span className="font-medium my-4">
+                    {formatPrice(product.price)}
+                  </span>
                 </div>
                 <button
                   type="button"
@@ -162,7 +164,9 @@ export default function () {
                   <p className="mt-[40px] font-normal w-full mb-5">
                     {product.title}
                   </p>
-                  <span className="font-medium my-4">{product.price}₫</span>
+                  <span className="font-medium my-4">
+                    {formatPrice(product.price)}
+                  </span>
                 </div>
                 <button
                   type="button"
@@ -216,7 +220,9 @@ export default function () {
                   <p className="mt-[40px] font-normal w-full mb-5">
                     {product.title}
                   </p>
-                  <span className="font-medium my-4">{product.price}</span>
+                  <span className="font-medium my-4">
+                    {formatPrice(product.price)}
+                  </span>
                 </div>
                 <button
                   type="button"

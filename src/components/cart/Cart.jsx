@@ -13,7 +13,7 @@ import {
   unincreaseQuantity,
   deleteProduct,
 } from "../../Slice/cartSlice";
-import "./cart.css";
+import { formatPrice } from "../../config/formatPrice";
 
 export default function Cart() {
   const itemsOfCart = useSelector((state) => state.cart.items);
@@ -78,7 +78,7 @@ export default function Cart() {
                 <div className="product-name w-[280px] font-light">
                   <a href="/#">{item.name}</a>
                 </div>
-                <div className="product-price">{item.price}₫</div>
+                <div className="product-price">{formatPrice(item.price)}</div>
                 <div className="product-quantity border-slate-300 flex border justify-center items-center py-1 px-1">
                   <div
                     className="decrease p-1"
@@ -96,7 +96,9 @@ export default function Cart() {
                     <IoIosArrowForward />
                   </div>
                 </div>
-                <div className="product-total">Giá sản phẩm: {item.total}₫</div>
+                <div className="product-total">
+                  Giá sản phẩm: {formatPrice(item.total)}
+                </div>
                 <div
                   className="product-cancel border p-1 mr-5"
                   onClick={() => {
@@ -145,7 +147,7 @@ export default function Cart() {
                 <div className="flex justify-between items-center">
                   <p className="text-thin text-sm">Tạm tính</p>
                   <span className="inline-block font-bold">
-                    {currentPrice}₫
+                    {formatPrice(currentPrice)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -157,7 +159,7 @@ export default function Cart() {
                 <div className="flex justify-between items-center">
                   <p className="text-thin text-sm">Tổng</p>
                   <span className="inline-block font-bold">
-                    {currentPrice}₫
+                    {formatPrice(currentPrice)}
                   </span>
                 </div>
                 <Link to={status_login ? "/checkout" : "/login"}>

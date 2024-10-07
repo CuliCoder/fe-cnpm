@@ -20,7 +20,6 @@ export default function MyAccount() {
   const [order, setOrder] = useState(false);
   const [address, setAddress] = useState(false);
   const [infoAccount, setInfoAccount] = useState(false);
-  const [info, setInfo] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -65,7 +64,6 @@ export default function MyAccount() {
         const res = await axios.post(
           "http://localhost/WriteResfulAPIPHP/api/user/changePass.php",
           {
-            user_id: localStorage.getItem("id"),
             current_password: password,
             rePass1: rePass1,
             rePass2: rePass2,
@@ -271,7 +269,7 @@ export default function MyAccount() {
 
                             <p className="text-2xl font-normal mt-5 ml-[70%]">
                               Tổng tiền:
-                              {order.total}
+                              {order.total_money}
                             </p>
                           </div>
                         </Accordion.Content>
@@ -297,12 +295,12 @@ export default function MyAccount() {
                 </Link>
 
                 <p className="mt-[30px]">
-                  Tên người nhận: <strong>{info.fullname}</strong>
+                  Tên người nhận: <strong>{userInfo.info.fullname}</strong>
                 </p>
                 <p>
-                  Số điện thoại: <strong>{info.phoneNumber}</strong>
+                  Số điện thoại: <strong>{userInfo.info.phoneNumber}</strong>
                 </p>
-                <p>{info.address}</p>
+                <p>{userInfo.info.address}</p>
               </div>
             )}
 

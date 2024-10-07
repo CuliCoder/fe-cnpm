@@ -12,16 +12,6 @@ export default function SearchProduct() {
   const { valueSearch } = useParams();
   const [productBySearch, setProductBySearch] = useState([]);
 
-  useEffect(() => {
-    const callApi = async () => {
-      const res = await axios.get(
-        `http://localhost:80/WriteResfulAPIPHP/api/product/find.php?search=${valueSearch}`
-      );
-      setProductBySearch(res.data);
-    };
-    callApi();
-  }, [valueSearch]);
-
   const dispatch = useDispatch();
 
   const formatNumber = (number) => {

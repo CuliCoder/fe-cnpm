@@ -9,10 +9,12 @@ import { IoIosArrowForward } from "react-icons/io";
 import { FaCartShopping } from "react-icons/fa6";
 import { useSelector, useDispatch } from "react-redux";
 import { addProduct } from "../../Slice/cartSlice";
+import { formatPrice } from "../../config/formatPrice";
 import "./ContentProduct.css";
 
 export default function ContentProduct() {
   const [showToast, setShowToast] = useState(false);
+  const [isSoldOut, setIsSoldOut] = useState(false);
   const dispatch = useDispatch();
   const itemsInCart = useSelector((state) => state.cart.items);
   let { productId } = useParams();
@@ -32,6 +34,10 @@ export default function ContentProduct() {
       setProductLimit(byUpdatedAt.slice(0, 12));
     }
   }, [byUpdatedAt]);
+
+  function isNumeric(value) {
+    return /^-?\d+$/.test(value);
+  }
   return (
     <div className="relative">
       {showToast && (
@@ -42,7 +48,6 @@ export default function ContentProduct() {
           <div className="ml-3 text-sm font-normal">
             Sản phẩm được thêm vào giỏ hàng thành công
           </div>
-          <Toast.Toggle onDismiss={() => setShowToast(false)} />
         </Toast>
       )}
       <div className="content pb-[120px]">
@@ -80,12 +85,12 @@ export default function ContentProduct() {
               {currentProduct && currentProduct.title}
             </p>
             <p className="price py-4 font-bold text-l">
-              {currentProduct && currentProduct.price}₫
+              {currentProduct && formatPrice(currentProduct.price)}
             </p>
             <p className="quote italic text-thin text-sm tracking-widest ">
               {currentProduct && currentProduct.description}
             </p>
-            <div className="flex py-[40px] gap-5">
+            <div className="flex pt-[40px] gap-5">
               <div className="product-quantity border-slate-300 flex border justify-center items-center py-1 px-1">
                 <div
                   className="decrease p-1 hover:cursor-pointer"
@@ -99,10 +104,24 @@ export default function ContentProduct() {
                 >
                   <IoIosArrowBack />
                 </div>
-                <div className="quantity px-3">{quantity}</div>
+                <input
+                  type="text"
+                  className="quantity px-3 border-0 focus:outline-none w-[50px]"
+                  value={quantity}
+                  onChange={(e) => {
+                    setQuantity(e.target.value);
+                    if (isNumeric(quantity)) {
+                      setQuantity(e.target.value);
+                    } else {
+                      setQuantity(1);
+                    }
+                  }}
+                />
                 <div
                   className="increase p-1 hover:cursor-pointer"
-                  onClick={() => setQuantity((quantity) => quantity + 1)}
+                  onClick={() => {
+                    setQuantity((quantity) => quantity + 1);
+                  }}
                 >
                   <IoIosArrowForward />
                 </div>
@@ -111,22 +130,38 @@ export default function ContentProduct() {
                 className="flex items-center px-8 py-3 bg-orange-500 text-white gap-2 cursor-pointer  hover:bg-slate-900 duration-200"
                 onClick={() => {
                   if (currentProduct) {
-                    dispatch(
-                      addProduct({
-                        id: currentProduct.id,
-                        name: currentProduct.title,
-                        price: currentProduct.price,
-                        quantity: quantity,
-                        total: currentProduct.price * quantity,
-                        thumbnail: currentProduct.thumbnail,
-                      })
-                    );
+                    if (currentProduct.quantity < quantity) {
+                      setIsSoldOut(true);
+                    } else {
+                      dispatch(
+                        addProduct({
+                          id: currentProduct.id,
+                          name: currentProduct.title,
+                          price: currentProduct.price,
+                          quantity: quantity,
+                          total: currentProduct.price * quantity,
+                          thumbnail: currentProduct.thumbnail,
+                        })
+                      );
+                      setShowToast(true);
+                      setIsSoldOut(false);
+                      setTimeout(() => {
+                        setShowToast(false);
+                      }, 1500);
+                    }
                   }
-                  setShowToast(true);
                 }}
               >
                 <FaCartShopping /> <p>Thêm vào giỏ hàng</p>
               </div>
+            </div>
+            <div className="pb-[40px]">
+              {isSoldOut && (
+                <p className="text-red-400">
+                  Số lượng trong kho không đủ với số lượng của bạn. Còn :{" "}
+                  {currentProduct.quantity}
+                </p>
+              )}
             </div>
             <div className="w-full h-[1px] bg-slate-300"></div>
             <div className="py-[50px]">

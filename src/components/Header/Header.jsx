@@ -10,6 +10,7 @@ import { BsCart } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteProduct } from "../../Slice/cartSlice";
+import { formatPrice } from "../../config/formatPrice";
 import logo from "../../Images/Comi_shop_logo.png";
 import "./header.css";
 export default function Header() {
@@ -197,7 +198,7 @@ export default function Header() {
                   minWidth: "50px",
                 }}
               >
-                {currentPrice}đ
+                {formatPrice(currentPrice)}
               </p>
             </div>
           </div>
@@ -250,7 +251,7 @@ export default function Header() {
                       <div className="w-[180px] ml-[-30px]">
                         <p className="text-sm text-slate-700">{product.name}</p>
                         <p>(x{product.quantity})</p>
-                        <p>{product.price * product.quantity}₫</p>
+                        <p>{formatPrice(product.price * product.quantity)}</p>
                       </div>
                       <div
                         className="w-3 h-3 border border-current flex justify-center items-center hover:border-orange-600 hover:cursor-pointer"
@@ -265,7 +266,7 @@ export default function Header() {
                   ))}
                 </div>
                 <div className="mt-[80px]">
-                  <p>Giá sản phẩm: {currentPrice}₫</p>
+                  <p>Giá sản phẩm: {formatPrice(currentPrice)}</p>
                   <div className="">
                     <Link
                       to={status_login ? "/checkout" : "/login"}
