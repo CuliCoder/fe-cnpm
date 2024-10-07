@@ -268,7 +268,7 @@ export default function Header() {
                   <p>Giá sản phẩm: {currentPrice}₫</p>
                   <div className="">
                     <Link
-                      to={localStorage.getItem("id") ? "/checkout" : "/login"}
+                      to={status_login ? "/checkout" : "/login"}
                       className="w-full h-[46px] bg-orange-500 text-white flex items-center justify-center mt-5 rounded-sm hover:bg-slate-400 hover:cursor-pointer duration-75 font-medium"
                     >
                       <FaLock />

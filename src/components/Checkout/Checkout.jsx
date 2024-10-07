@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../../Slice/cartSlice";
 import { FaCartPlus } from "react-icons/fa";
 import "./Checkout.css";
+import axiosConfig from "../../config/configAxios.js";
 
 export default function Checkout() {
   const [firstName, setFirstName] = useState("");
@@ -28,6 +29,8 @@ export default function Checkout() {
   const [currentPrice, setCurrentPrice] = useState(0);
   const [isLoad, setLoad] = useState(false);
   const [isToast, setToast] = useState(false);
+  const userInfo = useSelector((state) => state.user.information);
+
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
@@ -72,10 +75,9 @@ export default function Checkout() {
 
   const handleAcceptOrder = () => {
     async function sendOrder() {
-      const res = await axios.post(
-        "http://localhost/WriteResfulAPIPHP/admin/order/addOrder.php",
+      const res = await axiosConfig.post(
+        "http://localhost:3006/api/user/add_order",
         JSON.stringify({
-          userId: localStorage.getItem("id"),
           employeeId: null,
           fullname: `${firstName} ${lastName}`,
           phoneNumber: phoneNumber,

@@ -19,6 +19,8 @@ export default function Cart() {
   const itemsOfCart = useSelector((state) => state.cart.items);
   const [showToast, setShowToast] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0);
+  const [status_login, setStatus_login] = useState(false);
+  const status = useSelector((state) => state.status);
 
   const dispatch = useDispatch();
   const increaseItem = (item) => {
@@ -35,6 +37,9 @@ export default function Cart() {
     });
     setCurrentPrice(total);
   }, [itemsOfCart]);
+  useEffect(() => {
+    setStatus_login(status.error === 0);
+  }, [status.error]);
   return (
     <div>
       <div className="cart relative">
@@ -155,7 +160,7 @@ export default function Cart() {
                     {currentPrice}₫
                   </span>
                 </div>
-                <Link to={localStorage.getItem("id") ? "/checkout" : "/login"}>
+                <Link to={status_login ? "/checkout" : "/login"}>
                   <button
                     type="button"
                     className="h-full w-[300px] bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200 mt-5 flex items-center justify-center "
