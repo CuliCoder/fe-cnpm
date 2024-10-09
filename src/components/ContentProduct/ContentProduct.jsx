@@ -35,9 +35,6 @@ export default function ContentProduct() {
     }
   }, [byUpdatedAt]);
 
-  function isNumeric(value) {
-    return /^-?\d+$/.test(value);
-  }
   return (
     <div className="relative">
       {showToast && (
@@ -105,16 +102,12 @@ export default function ContentProduct() {
                   <IoIosArrowBack />
                 </div>
                 <input
-                  type="text"
+                  type="number"
                   className="quantity px-3 border-0 focus:outline-none w-[50px]"
                   value={quantity}
+                  min="1"
                   onChange={(e) => {
                     setQuantity(e.target.value);
-                    if (isNumeric(quantity)) {
-                      setQuantity(e.target.value);
-                    } else {
-                      setQuantity(1);
-                    }
                   }}
                 />
                 <div
