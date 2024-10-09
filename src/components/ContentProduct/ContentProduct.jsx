@@ -83,7 +83,7 @@ export default function ContentProduct() {
               {currentProduct && currentProduct.price}₫
             </p>
             <p className="quote italic text-thin text-sm tracking-widest ">
-              {currentProduct && currentProduct.description}
+              {currentProduct && currentProduct.introduce}
             </p>
             <div className="flex py-[40px] gap-5">
               <div className="product-quantity border-slate-300 flex border justify-center items-center py-1 px-1">
@@ -158,36 +158,11 @@ export default function ContentProduct() {
         </div>
         <div className="h-[1px] bg-slate-300 my-10 w-[1170px] m-auto"></div>
         <div className="desc w-[1170px] m-auto py-8 px-10 text-left border-slate-300 border rounded-[5px]">
-          {/* Gio thieu san pham */}
-          <div>
-            <h1 className="font-bold text-3xl py-4">Giới thiệu</h1>
-            {currentProduct &&
-              currentProduct.introduce
-                .split("\r\n\r\n")
-                .map((intro) => (
-                  <p className="py-2 text-thin font-sm text-[#555] leading-7">
-                    {intro}
-                  </p>
-                ))}
-          </div>
-
-          {/* Hinh anh mo ta */}
-          <div className="grid grid-cols-3 grid-rows-2 py-5 gap-1">
-            {currentProduct &&
-              currentProduct.gallery.map((image) => (
-                <img src={image} alt="..." className="inline-block" />
-              ))}
-          </div>
-          {/* Thong tin san pham */}
-          <div>
-            <h1 className="font-bold text-3xl py-4">Thông tin sản phẩm</h1>
-            <ul className="px-[30px] list-disc text-thin">
-              {currentProduct &&
-                currentProduct.information
-                  .split("\r\n")
-                  .map((intro) => <li>{intro}</li>)}
-            </ul>
-          </div>
+          {currentProduct && (
+            <div
+              dangerouslySetInnerHTML={{ __html: currentProduct.description }}
+            />
+          )}
         </div>
         <div className="text-left w-[1170px] m-auto py-20">
           <h1 className="font-medium text-md">SẢN PHẨM LIÊN QUAN</h1>
