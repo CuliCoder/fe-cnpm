@@ -8,6 +8,7 @@ import { clearCart } from "../../Slice/cartSlice";
 import { FaCartPlus } from "react-icons/fa";
 import "./Checkout.css";
 import axiosConfig from "../../config/configAxios.js";
+import { formatPrice } from "../../config/formatPrice.js";
 
 export default function Checkout() {
   const [firstName, setFirstName] = useState("");
@@ -89,7 +90,7 @@ export default function Checkout() {
           total: currentPrice,
         })
       );
-      if (res.data.success) {
+      if (res.data.status) {
         setLoad(true);
         setTimeout(() => {
           setToast(true);
@@ -366,13 +367,13 @@ export default function Checkout() {
                       <p>{product.name}</p>
                     </Link>
                     <div className="font-bold">
-                      <span>{parseInt(product.price)}đ</span>
+                      <span>{formatPrice(parseInt(product.price))}</span>
                     </div>
                     <div className="font-bold">
                       <span>x{product.quantity}</span>
                     </div>
                     <div className="total font-bold">
-                      <p>{product.price * product.quantity}đ</p>
+                      <p>{formatPrice(product.price * product.quantity)}</p>
                     </div>
                   </div>
                 ))}
@@ -381,15 +382,19 @@ export default function Checkout() {
                 <p className="font-bold text-xl">Giá trị đơn hàng</p>
                 <div className="flex justify-between items-center">
                   <p className="font-base text-slate-500">Giá sản phẩm</p>
-                  <span className="font-bold">{currentPrice}đ</span>
+                  <span className="font-bold">{formatPrice(currentPrice)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="font-base text-slate-500">Giao hàng</p>
-                  <span className="font-bold">GHTK đường bộ: {shipFee}đ</span>
+                  <span className="font-bold">
+                    GHTK đường bộ: {formatPrice(shipFee)}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="font-base text-slate-500">Tổng</p>
-                  <span className="font-bold">{currentPrice + shipFee}đ</span>
+                  <span className="font-bold">
+                    {formatPrice(currentPrice + shipFee)}
+                  </span>
                 </div>
               </div>
             </div>

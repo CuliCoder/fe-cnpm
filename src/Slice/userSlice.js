@@ -24,6 +24,17 @@ export const fetchOrderUser = createAsyncThunk(
     }
   }
 );
+export const fetchCouponUser = createAsyncThunk(
+  "user/fetchCouponUser",
+  async (_, rejectWithValue) => {
+    try {
+      const response = await axios.get("/api/user/coupon");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: "user",
@@ -35,6 +46,10 @@ const userSlice = createSlice({
     order: {
       loading: false,
       orders: [],
+    },
+    coupon: {
+      loading: false,
+      coupons: [],
     },
   },
   reducers: {},
@@ -59,6 +74,16 @@ const userSlice = createSlice({
       })
       .addCase(fetchOrderUser.rejected, (state) => {
         state.order.loading = false;
+      })
+      .addCase(fetchCouponUser.pending, (state) => {
+        state.coupon.loading = true;
+      })
+      .addCase(fetchCouponUser.fulfilled, (state, action) => {
+        state.coupon.coupons = action.payload;
+        state.coupon.loading = false;
+      })
+      .addCase(fetchCouponUser.rejected, (state) => {
+        state.coupon.loading = false;
       });
   },
 });

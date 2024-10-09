@@ -6,6 +6,7 @@ import statusReducer from "./Slice/status.js";
 import categoryReducer from "./Slice/categorySlice.js";
 import registerReducer from "./Slice/registerSlice.js";
 import userReducer from "./Slice/userSlice.js";
+import addressReducer from "./Slice/addressSlice.js";
 export default configureStore({
   reducer: {
     cart: cartReducer,
@@ -15,5 +16,6 @@ export default configureStore({
     category: categoryReducer,
     register: registerReducer,
     user: userReducer,
+    address: addressReducer,
   },
 });
