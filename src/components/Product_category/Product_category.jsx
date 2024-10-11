@@ -135,7 +135,7 @@ const Product_category = React.memo(() => {
               productsInCurrentPage.map((product, index) => (
                 <Link
                   to={`/product/${product.id}`}
-                  key={index}
+                  key={product.id}
                   className="h-[490px] product-item relative duration-1000 hover:cursor-pointer hover:shadow-md"
                 >
                   <div className="h-[350px] object-cover">
@@ -162,7 +162,7 @@ const Product_category = React.memo(() => {
                             name: product.title,
                             price: product.price,
                             quantity: 1,
-                            total: product.price * 1,
+                            total_price: product.price * 1,
                             thumbnail: product.thumbnail,
                           })
                         );

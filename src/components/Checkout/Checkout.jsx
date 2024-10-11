@@ -36,7 +36,7 @@ export default function Checkout() {
 
   const navigate = useNavigate();
 
-  const productInCart = useSelector((state) => state.cart.items);
+  const productInCart = useSelector((state) => state.cart.getCart.items);
 
   useEffect(() => {
     axios

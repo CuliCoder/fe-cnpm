@@ -9,12 +9,12 @@ import { useState } from "react";
 import { BsCart } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteProduct } from "../../Slice/cartSlice";
+import { deleteProduct, removeFromCart } from "../../Slice/cartSlice";
 import { formatPrice } from "../../config/formatPrice";
 import logo from "../../Images/Comi_shop_logo.png";
 import "./header.css";
 export default function Header() {
-  const productInCart = useSelector((state) => state.cart.items);
+  const productInCart = useSelector((state) => state.cart.getCart.items);
   const dispatch = useDispatch();
   const [enable, setEnable] = useState("hidden");
   const [hasproducts, setHasProducts] = useState(true);
@@ -242,7 +242,7 @@ export default function Header() {
                   )}
                   {/* Item */}
                   {productInCart.map((product) => (
-                    <div className="flex justify-between mb-3">
+                    <div className="flex justify-between mb-3" key={product.id}>
                       <img
                         className="w-[90px] "
                         src={product.thumbnail}
@@ -258,6 +258,13 @@ export default function Header() {
                         onClick={() => {
                           dispatch(deleteProduct(product));
                           setShowToast(true);
+                          setTimeout(() => {
+                            setShowToast(false);
+                          }, 3000);
+                          {
+                            status.error === 0 &&
+                              dispatch(removeFromCart(product.id));
+                          }
                         }}
                       >
                         <LiaTimesSolid />

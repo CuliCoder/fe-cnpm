@@ -10,6 +10,7 @@ import { FaCartShopping } from "react-icons/fa6";
 import { useSelector, useDispatch } from "react-redux";
 import { addProduct } from "../../Slice/cartSlice";
 import { formatPrice } from "../../config/formatPrice";
+import { fetchAddToCart } from "../../Slice/cartSlice";
 import "./ContentProduct.css";
 
 export default function ContentProduct() {
@@ -22,6 +23,8 @@ export default function ContentProduct() {
   const [quantity, setQuantity] = useState(1);
   const [productlimit, setProductLimit] = useState([]);
   const { byUpdatedAt } = useSelector((state) => state.products.products_page);
+  const status = useSelector((state) => state.status);
+  const addToCart = useSelector((state) => state.cart.addCart);
   useEffect(() => {
     if (byUpdatedAt) {
       setCurrentProduct(
@@ -43,7 +46,7 @@ export default function ContentProduct() {
             <HiCheck className="h-5 w-5" />
           </div>
           <div className="ml-3 text-sm font-normal">
-            Sản phẩm được thêm vào giỏ hàng thành công
+            {addToCart.message || "Thêm sản phẩm vào giỏ hàng thành công"}
           </div>
         </Toast>
       )}
@@ -92,7 +95,8 @@ export default function ContentProduct() {
                 <div
                   className="decrease p-1 hover:cursor-pointer"
                   onClick={() => {
-                    if (quantity <= 1) {
+                    console.log(quantity);
+                    if (quantity <= 1 || isNaN(quantity)) {
                       setQuantity(1);
                     } else {
                       setQuantity((quantity) => quantity - 1);
@@ -107,13 +111,15 @@ export default function ContentProduct() {
                   value={quantity}
                   min="1"
                   onChange={(e) => {
-                    setQuantity(e.target.value);
+                    setQuantity(parseInt(e.target.value));
                   }}
                 />
                 <div
                   className="increase p-1 hover:cursor-pointer"
                   onClick={() => {
-                    setQuantity((quantity) => quantity + 1);
+                    setQuantity(
+                      isNaN(quantity) ? 1 : (quantity) => quantity + 1
+                    );
                   }}
                 >
                   <IoIosArrowForward />
@@ -126,13 +132,25 @@ export default function ContentProduct() {
                     if (currentProduct.quantity < quantity) {
                       setIsSoldOut(true);
                     } else {
+                      {
+                        status.error === 0 &&
+                          dispatch(
+                            fetchAddToCart({
+                              id_product: currentProduct.id,
+                              quantity,
+                              price: currentProduct.price,
+                              product_title: currentProduct.title,
+                              product_thumbnail: currentProduct.thumbnail,
+                            })
+                          );
+                      }
                       dispatch(
                         addProduct({
                           id: currentProduct.id,
                           name: currentProduct.title,
                           price: currentProduct.price,
                           quantity: quantity,
-                          total: currentProduct.price * quantity,
+                          total_price: currentProduct.price * quantity,
                           thumbnail: currentProduct.thumbnail,
                         })
                       );

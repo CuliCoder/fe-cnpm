@@ -21,6 +21,7 @@ import { fetchAddressWithId } from "../../Slice/addressSlice";
 import { formatPrice } from "../../config/formatPrice";
 import "./MyAccount.css";
 import { handleCopyToClipboard } from "../../config/copyToClipboard";
+import { clearCart } from "../../Slice/cartSlice";
 
 export default function MyAccount() {
   const [account, setAccount] = useState(true);
@@ -47,6 +48,7 @@ export default function MyAccount() {
     setOpenModal(true);
     dispatch(logout());
     dispatch(setIsLogin(1));
+    dispatch(clearCart())
     navigate("/login");
   };
 

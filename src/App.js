@@ -1,9 +1,7 @@
 import React from "react";
-import { Provider } from "react-redux";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import "./App.css";
-import store from "./store.js";
 import Cart from "./components/cart/Cart.jsx";
 import Register from "./components/Register/Register.jsx";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword.jsx";
@@ -22,23 +20,31 @@ import { useDispatch, useSelector } from "react-redux";
 import Spinner from "./components/Spinner/Spinner";
 import { fetchAllProducts } from "./Slice/products";
 import { fetchAllCategory } from "./Slice/categorySlice";
+import { fetchCart } from "./Slice/cartSlice";
 function App() {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.status);
   const products_page = useSelector((state) => state.products.products_page);
   const category = useSelector((state) => state.category);
+  const getCart = useSelector((state) => state.cart.getCart);
   useEffect(() => {
     dispatch(fetchAllProducts());
     dispatch(fetchAllCategory());
     dispatch(check_status());
   }, []);
-  
+  useEffect(() => {
+    if (status.error === 0) {
+      dispatch(fetchCart());
+    }
+  }, [status.error]);
   if (status.error === null) {
     return <Spinner />;
   }
   return (
     <Router>
-      {(products_page.loading || category.loading) && <Spinner />}
+      {(products_page.loading || category.loading || getCart.loading) && (
+        <Spinner />
+      )}
       <Routes>
         <Route
           path="/"
