@@ -17,7 +17,7 @@ export default function Header() {
   const productInCart = useSelector((state) => state.cart.getCart.items);
   const dispatch = useDispatch();
   const [enable, setEnable] = useState("hidden");
-  const [hasproducts, setHasProducts] = useState(true);
+  const [hasproducts, setHasProducts] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0);
@@ -38,6 +38,7 @@ export default function Header() {
       total += parseInt(item.price * item.quantity);
     });
     setCurrentPrice(total);
+    setHasProducts(productInCart.length > 0);
   }, [productInCart]);
 
   const handleSearchProduct = () => {
@@ -141,6 +142,11 @@ export default function Header() {
               onChange={(e) => {
                 setSearchValue(e.target.value);
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  document.querySelector(".search-icon").click();
+                }
+              }}
               value={searchValue}
             />
             {/* Btn search */}
@@ -149,7 +155,7 @@ export default function Header() {
                 backgroundColor: "white",
                 paddingBottom: "8px",
               }}
-              className="search-icon"
+              className="search-icon hover:cursor-pointer"
               onClick={() => {
                 handleSearchProduct();
               }}
@@ -172,7 +178,7 @@ export default function Header() {
 
             {/* Cart */}
             <div
-              className="flex items-starts relative "
+              className="flex items-starts relative hover:cursor-pointer"
               onClick={() => {
                 setEnable("block");
               }}
@@ -276,7 +282,13 @@ export default function Header() {
                   <p>Giá sản phẩm: {formatPrice(currentPrice)}</p>
                   <div className="">
                     <Link
-                      to={status_login ? "/checkout" : "/login"}
+                      to={
+                        productInCart.length > 0
+                          ? status_login
+                            ? "/checkout"
+                            : "/login"
+                          : ""
+                      }
                       className="w-full h-[46px] bg-orange-500 text-white flex items-center justify-center mt-5 rounded-sm hover:bg-slate-400 hover:cursor-pointer duration-75 font-medium"
                     >
                       <FaLock />
@@ -295,9 +307,12 @@ export default function Header() {
             ) : (
               <div>
                 <p>Bạn chưa có sản phẩm nào trong giỏ</p>
-                <div className="w-60 h-[46px] bg-orange-500 text-white flex items-center justify-center mt-5 rounded-sm hover:bg-slate-400 hover:cursor-pointer duration-75 font-medium">
+                <Link
+                  to="/products"
+                  className="w-60 h-[46px] bg-orange-500 text-white flex items-center justify-center mt-5 rounded-sm hover:bg-slate-400 hover:cursor-pointer duration-75 font-medium"
+                >
                   <p> TIẾP TỤC MUA SẮM</p>
-                </div>
+                </Link>
               </div>
             )}
           </div>

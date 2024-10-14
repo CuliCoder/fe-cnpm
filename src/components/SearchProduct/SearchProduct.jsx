@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Breadcrumb } from "flowbite-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../Slice/cartSlice";
 import { FaCartPlus } from "react-icons/fa";
 
-import axios from "axios";
 import "./SearchProduct.css";
 
 export default function SearchProduct() {
   const { valueSearch } = useParams();
   const [productBySearch, setProductBySearch] = useState([]);
-
+  const products = useSelector(
+    (state) => state.products.products_page.byUpdatedAt
+  );
   const dispatch = useDispatch();
-
+  useEffect(() => {
+    if (products && products.length > 0) {
+      let productSearch = products.filter((product) =>
+        product.title.toLowerCase().includes(valueSearch)
+      );
+      setProductBySearch(productSearch);  
+    }
+  }, [products, valueSearch]);
   const formatNumber = (number) => {
     const formatter = new Intl.NumberFormat("vi-VN", {
       style: "currency",

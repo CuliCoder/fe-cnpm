@@ -32,6 +32,7 @@ export default function MyAccount() {
 
   const [addressForm, setAddressForm] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [fullName, setFullName] = useState("");
@@ -48,53 +49,44 @@ export default function MyAccount() {
     setOpenModal(true);
     dispatch(logout());
     dispatch(setIsLogin(1));
-    dispatch(clearCart())
+    dispatch(clearCart());
     navigate("/login");
   };
-
   useEffect(() => {
-    dispatch(fetchInfoUser());
-    dispatch(fetchOrderUser());
-    dispatch(fetchCouponUser());
-    dispatch(fetchAddressWithId());
-  }, []);
+    if (account || infoAccount) {
+      dispatch(fetchInfoUser());
+    }
+  }, [account, infoAccount]);
+  useEffect(() => {
+    if (address) {
+      dispatch(fetchAddressWithId());
+    }
+  }, [address]);
+  useEffect(() => {
+    if (order) {
+      dispatch(fetchOrderUser());
+    }
+  }, [order]);
+  useEffect(() => {
+    if (discount) {
+      dispatch(fetchCouponUser());
+    }
+  }, [discount]);
+  useEffect(() => {
+    if (userInfo.info) {
+      setFirstName(userInfo.info.first_name);
+      setLastName(userInfo.info.last_name);
+      setFullName(userInfo.info.fullname);
+    }
+  }, [userInfo.info]);
 
   const handleChangeInfo = () => {
-    const changeInfo = async () => {
-      if (password === "") {
-        const res = await axios.post(
-          "http://localhost/WriteResfulAPIPHP/api/user/editInfo.php",
-          {
-            user_id: localStorage.getItem("id"),
-            fullname: fullName,
-            firstname: firstName,
-            lastname: lastName,
-          }
-        );
-        if (res.data.success) {
-          alert(res.data.message);
-        }
-        return;
-      }
-      if (firstName === "" || lastName === "" || fullName === "") {
-        const res = await axios.post(
-          "http://localhost/WriteResfulAPIPHP/api/user/changePass.php",
-          {
-            current_password: password,
-            rePass1: rePass1,
-            rePass2: rePass2,
-          }
-        );
-        if (res.data.success) {
-          alert(res.data.message);
-        }
-        return;
-      }
-    };
-    changeInfo();
+    let rgName = /^(?!\s*$)[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+$/;
+    if (!rgName.test(fullName)) {
+      alert("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
   };
-
-  console.log(userCoupon);
 
   return (
     <div>

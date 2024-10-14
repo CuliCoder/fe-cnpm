@@ -182,7 +182,15 @@ export default function Cart() {
                     {formatPrice(currentPrice)}
                   </span>
                 </div>
-                <Link to={status_login ? "/checkout" : "/login"}>
+                <Link
+                  to={
+                    itemsOfCart.length > 0
+                      ? status_login
+                        ? "/checkout"
+                        : "/login"
+                      : ""
+                  }
+                >
                   <button
                     type="button"
                     className="h-full w-[300px] bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200 mt-5 flex items-center justify-center "
