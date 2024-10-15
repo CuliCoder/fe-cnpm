@@ -35,7 +35,24 @@ export const fetchCouponUser = createAsyncThunk(
     }
   }
 );
-
+export const fetchChangePassword = createAsyncThunk(
+  "user/fetchChangePassword",
+  async (
+    { current_password, new_password, repeat_password },
+    { _, rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.post("/api/user/changePassword", {
+        current_password,
+        new_password,
+        repeat_password,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -50,6 +67,11 @@ const userSlice = createSlice({
     coupon: {
       loading: false,
       coupons: [],
+    },
+    changePassword: {
+      loading: false,
+      error: null,
+      message: null,
     },
   },
   reducers: {},
@@ -84,6 +106,17 @@ const userSlice = createSlice({
       })
       .addCase(fetchCouponUser.rejected, (state) => {
         state.coupon.loading = false;
+      })
+      .addCase(fetchChangePassword.pending, (state) => {
+        state.changePassword.loading = true;
+      })
+      .addCase(fetchChangePassword.fulfilled, (state, action) => {
+        state.changePassword.error = action.payload.error;
+        state.changePassword.message = action.payload.message;
+        state.changePassword.loading = false;
+      })
+      .addCase(fetchChangePassword.rejected, (state) => {
+        state.changePassword.loading = false;
       });
   },
 });

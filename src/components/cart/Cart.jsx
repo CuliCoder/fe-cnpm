@@ -12,23 +12,40 @@ import {
   increaseQuantity,
   unincreaseQuantity,
   deleteProduct,
+  changeQuantity,
+  removeFromCart,
 } from "../../Slice/cartSlice";
 import { formatPrice } from "../../config/formatPrice";
 
 export default function Cart() {
-  const itemsOfCart = useSelector((state) => state.cart.items);
+  const itemsOfCart = useSelector((state) => state.cart.getCart.items);
   const [showToast, setShowToast] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [status_login, setStatus_login] = useState(false);
   const status = useSelector((state) => state.status);
-
+  const products = useSelector((state) => state.products.products_page);
   const dispatch = useDispatch();
   const increaseItem = (item) => {
+    const product = products.byUpdatedAt.find(
+      (product) => product.id === item.id
+    );
+    if (product.quantity < item.quantity + 1) {
+      return;
+    }
     dispatch(increaseQuantity(item));
+    {
+      status.error === 0 && dispatch(changeQuantity({ item, offset: 1 }));
+    }
   };
 
   const decreaseItem = (item) => {
+    if (item.quantity === 1) {
+      return;
+    }
     dispatch(unincreaseQuantity(item));
+    {
+      status.error === 0 && dispatch(changeQuantity({ item, offset: -1 }));
+    }
   };
   useEffect(() => {
     let total = 0;
@@ -68,11 +85,11 @@ export default function Cart() {
           <div className="cart-box w-[1170px] m-auto">
             {/* Print List */}
             {itemsOfCart.map((item) => (
-              <div className="item h-[154px] bg-[#fcfcfc] flex items-center justify-between my-2">
-                <div
-                  className="product-img w-[120px] object-cover
-              "
-                >
+              <div
+                className="item h-[154px] bg-[#fcfcfc] flex items-center justify-between my-2"
+                key={item.id}
+              >
+                <div className="product-img w-[120px] object-cover">
                   <img src={item.thumbnail} alt="Anh san pham" />
                 </div>
                 <div className="product-name w-[280px] font-light">
@@ -97,13 +114,16 @@ export default function Cart() {
                   </div>
                 </div>
                 <div className="product-total">
-                  Giá sản phẩm: {formatPrice(item.total)}
+                  Giá sản phẩm: {formatPrice(item.total_price)}
                 </div>
                 <div
                   className="product-cancel border p-1 mr-5"
                   onClick={() => {
                     dispatch(deleteProduct(item));
                     setShowToast(true);
+                    {
+                      status.error === 0 && dispatch(removeFromCart(item.id));
+                    }
                   }}
                 >
                   <FaTimes />
@@ -162,7 +182,15 @@ export default function Cart() {
                     {formatPrice(currentPrice)}
                   </span>
                 </div>
-                <Link to={status_login ? "/checkout" : "/login"}>
+                <Link
+                  to={
+                    itemsOfCart.length > 0
+                      ? status_login
+                        ? "/checkout"
+                        : "/login"
+                      : ""
+                  }
+                >
                   <button
                     type="button"
                     className="h-full w-[300px] bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200 mt-5 flex items-center justify-center "

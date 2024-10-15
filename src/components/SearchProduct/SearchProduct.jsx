@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Breadcrumb } from "flowbite-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../Slice/cartSlice";
 import { FaCartPlus } from "react-icons/fa";
 
-import axios from "axios";
 import "./SearchProduct.css";
 
 export default function SearchProduct() {
   const { valueSearch } = useParams();
   const [productBySearch, setProductBySearch] = useState([]);
-
+  const products = useSelector(
+    (state) => state.products.products_page.byUpdatedAt
+  );
   const dispatch = useDispatch();
-
+  useEffect(() => {
+    if (products && products.length > 0) {
+      let productSearch = products.filter((product) =>
+        product.title.toLowerCase().includes(valueSearch)
+      );
+      setProductBySearch(productSearch);  
+    }
+  }, [products, valueSearch]);
   const formatNumber = (number) => {
     const formatter = new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -50,7 +58,7 @@ export default function SearchProduct() {
             productBySearch.map((product, index) => (
               <Link
                 to={`/product/${product.id}`}
-                key={index}
+                key={product.id}
                 className="h-[490px] product-item relative duration-1000 hover:cursor-pointer hover:shadow-md"
               >
                 <div className="h-[350px] object-cover">
@@ -77,7 +85,7 @@ export default function SearchProduct() {
                           name: product.title,
                           price: product.price,
                           quantity: 1,
-                          total: product.price * 1,
+                          total_price: product.price * 1,
                           thumbnail: product.thumbnail,
                         })
                       );

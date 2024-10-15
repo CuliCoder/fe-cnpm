@@ -36,7 +36,7 @@ export default function Checkout() {
 
   const navigate = useNavigate();
 
-  const productInCart = useSelector((state) => state.cart.items);
+  const productInCart = useSelector((state) => state.cart.getCart.items);
 
   useEffect(() => {
     axios
@@ -77,7 +77,7 @@ export default function Checkout() {
   const handleAcceptOrder = () => {
     async function sendOrder() {
       const res = await axiosConfig.post(
-        "http://localhost:3006/api/user/add_order",
+        "/api/user/add_order",
         JSON.stringify({
           employeeId: null,
           fullname: `${firstName} ${lastName}`,
