@@ -64,7 +64,7 @@ export default function Login() {
             onChange={(e) => {
               setEmail(e.target.value);
             }}
-            autoComplete="off"
+            autoComplete="on"
             className="outline-none border w-full my-2 px-2 py-2 focus:shadow"
           />
           <div className="flex">

@@ -338,7 +338,7 @@ export default function MyAccount() {
                         <p className="font-semibold">
                           Mã: {item.coupon_code}{" "}
                           <span
-                            className="border text-center bg-gray-300 leading-[8px] px-1 "
+                            className="border text-center bg-gray-300 leading-[8px] px-1 cursor-pointer"
                             onClick={() => {
                               handleCopyToClipboard(item.coupon_code);
                             }}
@@ -359,7 +359,6 @@ export default function MyAccount() {
               <div className="pt-10">
                 <p className="text-3xl font-bold">My Address</p>
                 <p className="font-thin text-base text-slate-500">
-                  {" "}
                   Địa chỉ này sẽ được làm địa chỉ mặc định để nhận hàng
                 </p>
 

@@ -11,6 +11,7 @@ import tarotKieu from "../../Images/Banner/tarotKieu.jpg";
 import thunhoibong from "../../Images/Banner/thunhoibongvang.jpg";
 import { useSelector } from "react-redux";
 import { formatPrice } from "../../config/formatPrice";
+import Chat from "../Chat/Chat";
 export default function () {
   const { newProducts, byCategory1, byCategory2 } = useSelector(
     (state) => state.products.products_mainpage
@@ -18,7 +19,7 @@ export default function () {
   return (
     <>
       {/* {loading && <Spinner />} */}
-      <div className="mb-20">
+      <div className="mb-20 relative">
         <div className="banner mb-8">
           <div className="flex">
             <div className="relative overflow-hidden ">
@@ -143,6 +144,7 @@ export default function () {
             </div>
           </div>
         </div>
+        <Chat />
         <div className="w-[1170px] m-auto text-center">
           <h1 className="text-6xl font-thin text-slate-100 tracking-wide">
             Truyện tranh Việt Nam đặc sắc
