@@ -21,8 +21,9 @@ const categorySlice = createSlice({
   reducers: {
     findCategory: (state, action) => {
       const { id } = action.payload;
-      state.category_current = state.categories.find(
-        (category) => category.id === parseInt(id)
+      const categories = JSON.parse(JSON.stringify(state.categories));
+      state.category_current = categories.find(
+        (category) => category.value === parseInt(id)
       );
     },
   },

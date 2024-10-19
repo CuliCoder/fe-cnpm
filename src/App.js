@@ -21,16 +21,22 @@ import Spinner from "./components/Spinner/Spinner";
 import { fetchAllProducts } from "./Slice/products";
 import { fetchAllCategory } from "./Slice/categorySlice";
 import { fetchCart } from "./Slice/cartSlice";
+import { fetchAllAuthor } from "./Slice/authorSlice.js";
+import Author from "./components/Author/Author.js";
+import axios from "./config/configAxios.js";
 function App() {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.status);
   const products_page = useSelector((state) => state.products.products_page);
   const category = useSelector((state) => state.category);
   const getCart = useSelector((state) => state.cart.getCart);
+  const itemsOfCart = useSelector((state) => state.cart.getCart.items);
+  const addCart = useSelector((state) => state.cart.addCart);
   useEffect(() => {
+    dispatch(check_status());
     dispatch(fetchAllProducts());
     dispatch(fetchAllCategory());
-    dispatch(check_status());
+    dispatch(fetchAllAuthor());
   }, []);
   useEffect(() => {
     if (status.error === 0) {
@@ -42,9 +48,10 @@ function App() {
   }
   return (
     <Router>
-      {(products_page.loading || category.loading || getCart.loading) && (
-        <Spinner />
-      )}
+      {(products_page.loading ||
+        category.loading ||
+        getCart.loading ||
+        addCart.loading) && <Spinner />}
       <Routes>
         <Route
           path="/"
@@ -111,7 +118,15 @@ function App() {
           path="/checkout"
           element={
             <Layout>
-              <Payment />
+              {status.error === 0 ? (
+                itemsOfCart.length > 0 ? (
+                  <Payment />
+                ) : (
+                  <Products />
+                )
+              ) : (
+                <Login />
+              )}
             </Layout>
           }
         ></Route>
@@ -136,6 +151,14 @@ function App() {
           element={
             <Layout>
               <Product_category />
+            </Layout>
+          }
+        ></Route>
+        <Route
+          path="/author/:id"
+          element={
+            <Layout>
+              <Author />
             </Layout>
           }
         ></Route>

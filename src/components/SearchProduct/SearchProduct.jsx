@@ -4,7 +4,7 @@ import { Breadcrumb } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../Slice/cartSlice";
 import { FaCartPlus } from "react-icons/fa";
-
+import { fetchAddToCart } from "../../Slice/cartSlice";
 import "./SearchProduct.css";
 
 export default function SearchProduct() {
@@ -13,13 +13,14 @@ export default function SearchProduct() {
   const products = useSelector(
     (state) => state.products.products_page.byUpdatedAt
   );
+  const status = useSelector((state) => state.status);
   const dispatch = useDispatch();
   useEffect(() => {
     if (products && products.length > 0) {
       let productSearch = products.filter((product) =>
         product.title.toLowerCase().includes(valueSearch)
       );
-      setProductBySearch(productSearch);  
+      setProductBySearch(productSearch);
     }
   }, [products, valueSearch]);
   const formatNumber = (number) => {
@@ -42,7 +43,10 @@ export default function SearchProduct() {
               <Link to="/">Trang Chủ</Link>
             </Breadcrumb.Item>
             <Breadcrumb.Item>
-              <Link to="/products">Tìm kiếm</Link>{" "}
+              <Link to="/products">Cửa hàng</Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <div className="font-bold text-gray-800">{`Kết quả tìm kiếm cho ${valueSearch}`}</div>{" "}
             </Breadcrumb.Item>
           </div>
         </div>
@@ -79,6 +83,16 @@ export default function SearchProduct() {
                   hover:bg-slate-900 duration-200 items-center justify-center absolute top-[80%] left-3
                   `}
                     onClick={() => {
+                      {
+                        status.error === 0 &&
+                          dispatch(
+                            fetchAddToCart({
+                              id_product: product.id,
+                              quantity: 1,
+                              price: product.price,
+                            })
+                          );
+                      }
                       dispatch(
                         addProduct({
                           id: product.id,

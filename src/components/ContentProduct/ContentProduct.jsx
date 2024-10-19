@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Carousel, Breadcrumb, Toast } from "flowbite-react";
+import { Carousel, Breadcrumb } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import { FaCartPlus } from "react-icons/fa";
 import { useParams, Link } from "react-router-dom";
@@ -11,13 +11,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { addProduct } from "../../Slice/cartSlice";
 import { formatPrice } from "../../config/formatPrice";
 import { fetchAddToCart } from "../../Slice/cartSlice";
+import { setShowToast } from "../../Slice/MyToastSlice";
 import "./ContentProduct.css";
 
-export default function ContentProduct() {
-  const [showToast, setShowToast] = useState(false);
+const ContentProduct = React.memo(() => {
   const [isSoldOut, setIsSoldOut] = useState(false);
   const dispatch = useDispatch();
-  const itemsInCart = useSelector((state) => state.cart.items);
+  const itemsInCart = useSelector((state) => state.cart.getCart.items);
   let { productId } = useParams();
   const [currentProduct, setCurrentProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -37,19 +37,18 @@ export default function ContentProduct() {
       setProductLimit(byUpdatedAt.slice(0, 12));
     }
   }, [byUpdatedAt]);
-
+  useEffect(() => {
+    if (addToCart.error === null || addToCart.loading) return;
+    dispatch(
+      setShowToast({
+        show: true,
+        type: addToCart.error === 0 ? "success" : "error",
+        message: addToCart.message,
+      })
+    );
+  }, [addToCart.loading, addToCart.error]);
   return (
     <div className="relative">
-      {showToast && (
-        <Toast className="absolute top-10 right-5">
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200 ">
-            <HiCheck className="h-5 w-5" />
-          </div>
-          <div className="ml-3 text-sm font-normal">
-            {addToCart.message || "Thêm sản phẩm vào giỏ hàng thành công"}
-          </div>
-        </Toast>
-      )}
       <div className="content pb-[120px]">
         <Breadcrumb
           aria-label="Solid background breadcrumb example"
@@ -95,7 +94,6 @@ export default function ContentProduct() {
                 <div
                   className="decrease p-1 hover:cursor-pointer"
                   onClick={() => {
-                    console.log(quantity);
                     if (quantity <= 1 || isNaN(quantity)) {
                       setQuantity(1);
                     } else {
@@ -117,9 +115,7 @@ export default function ContentProduct() {
                 <div
                   className="increase p-1 hover:cursor-pointer"
                   onClick={() => {
-                    setQuantity(
-                      isNaN(quantity) ? 1 : (quantity) => quantity + 1
-                    );
+                    setQuantity(isNaN(quantity) ? 1 : quantity + 1);
                   }}
                 >
                   <IoIosArrowForward />
@@ -129,37 +125,50 @@ export default function ContentProduct() {
                 className="flex items-center px-8 py-3 bg-orange-500 text-white gap-2 cursor-pointer  hover:bg-slate-900 duration-200"
                 onClick={() => {
                   if (currentProduct) {
+                    const itemCurrent = itemsInCart.find((item) => {
+                      return item.id === currentProduct.id;
+                    });
+                    if (itemCurrent) {
+                      if (
+                        itemCurrent.quantity + quantity >
+                        currentProduct.quantity
+                      ) {
+                        dispatch(
+                          setShowToast({
+                            show: true,
+                            type: "error",
+                            message:
+                              "Số lượng sản phẩm trong giỏ hàng vượt quá số lượng trong kho",
+                          })
+                        );
+                        return;
+                      }
+                    }
                     if (currentProduct.quantity < quantity) {
                       setIsSoldOut(true);
-                    } else {
-                      {
-                        status.error === 0 &&
-                          dispatch(
-                            fetchAddToCart({
-                              id_product: currentProduct.id,
-                              quantity,
-                              price: currentProduct.price,
-                              product_title: currentProduct.title,
-                              product_thumbnail: currentProduct.thumbnail,
-                            })
-                          );
-                      }
-                      dispatch(
-                        addProduct({
-                          id: currentProduct.id,
-                          name: currentProduct.title,
-                          price: currentProduct.price,
-                          quantity: quantity,
-                          total_price: currentProduct.price * quantity,
-                          thumbnail: currentProduct.thumbnail,
-                        })
-                      );
-                      setShowToast(true);
-                      setIsSoldOut(false);
-                      setTimeout(() => {
-                        setShowToast(false);
-                      }, 1500);
+                      return;
                     }
+                    dispatch(
+                      addProduct({
+                        id: currentProduct.id,
+                        name: currentProduct.title,
+                        price: currentProduct.price,
+                        quantity,
+                        total_price: currentProduct.price * quantity,
+                        thumbnail: currentProduct.thumbnail,
+                      })
+                    );
+                    {
+                      status.error === 0 &&
+                        dispatch(
+                          fetchAddToCart({
+                            id_product: currentProduct.id,
+                            quantity,
+                            price: currentProduct.price,
+                          })
+                        );
+                    }
+                    setIsSoldOut(false);
                   }
                 }}
               >
@@ -325,4 +334,5 @@ export default function ContentProduct() {
       </div>
     </div>
   );
-}
+});
+export default ContentProduct;

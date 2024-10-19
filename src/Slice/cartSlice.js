@@ -17,17 +17,18 @@ export const fetchCart = createAsyncThunk(
 );
 export const fetchAddToCart = createAsyncThunk(
   "cart/fetchAddToCart",
-  async (
-    { id_product, quantity, price, product_title, product_thumbnail },
-    { rejectWithValue }
-  ) => {
+  async ({ id_product, quantity, price }, { rejectWithValue }) => {
     try {
+      if (quantity <= 0 || isNaN(quantity))
+        return {
+          message: "Số lượng không hợp lệ",
+          error: 1,
+        }
+      
       const response = await axios.post("/api/cart/addToCart", {
         id_product,
         quantity,
         price,
-        product_title,
-        product_thumbnail,
       });
       return response.data;
     } catch (error) {
@@ -45,8 +46,6 @@ export const changeQuantity = createAsyncThunk(
           id_product: item.id,
           quantity: offset,
           price: item.price,
-          product_title: item.name,
-          product_thumbnail: item.thumbnail,
         });
         return response.data;
       }
@@ -88,11 +87,13 @@ const cartSlice = createSlice({
   },
   reducers: {
     addProduct: (state, action) => {
+      if (action.payload.quantity <= 0 || isNaN(action.payload.quantity))
+        return;
       const existingItem = state.getCart.items.find(
         (item) => item.id === action.payload.id
       );
       if (existingItem) {
-        existingItem.quantity++;
+        existingItem.quantity += action.payload.quantity;
       } else {
         state.getCart.items.push(action.payload);
       }

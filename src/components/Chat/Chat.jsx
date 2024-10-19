@@ -28,7 +28,7 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    const newSocket = io.connect("http://localhost:3006");
+    const newSocket = io.connect(process.env.REACT_APP_API_URL);
     setSocket(newSocket);
 
     newSocket.on("adminResponse", (data) => {

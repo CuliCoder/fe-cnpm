@@ -6,7 +6,10 @@ export const fetchAllProducts = createAsyncThunk(
   async (_, rejectWithValue) => {
     try {
       const response = await axios.get("/api/product");
-      return response.data;
+      const result = response.data.filter((product) => {
+        return product.quantity !== null || product.quantity > 0;
+      });
+      return result;
     } catch (error) {
       return rejectWithValue(error);
     }

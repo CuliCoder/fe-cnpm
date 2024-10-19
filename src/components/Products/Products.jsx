@@ -6,6 +6,7 @@ import { Pagination } from "flowbite-react";
 import { CgMenuGridR } from "react-icons/cg";
 import { FaCartPlus } from "react-icons/fa";
 import { Breadcrumb } from "flowbite-react";
+import { fetchAddToCart } from "../../Slice/cartSlice";
 const Products = React.memo(() => {
   const [currentPage, setCurrentPage] = useState(1);
   const onPageChange = (page) => setCurrentPage(page);
@@ -20,7 +21,7 @@ const Products = React.memo(() => {
   const { byUpdatedAt, byPriceAsc, byPriceDesc, loading } = useSelector(
     (state) => state.products.products_page
   );
-
+  const status = useSelector((state) => state.status);
   useEffect(() => {
     const handleFillProduct = () => {
       switch (fillterValue) {
@@ -92,7 +93,9 @@ const Products = React.memo(() => {
                 <Link to="/">Trang Chủ</Link>
               </Breadcrumb.Item>
               <Breadcrumb.Item>
-                <Link to="/products">Sản phẩm</Link>{" "}
+                <Link to="/products" className="font-bold text-gray-800">
+                  Cửa hàng
+                </Link>{" "}
               </Breadcrumb.Item>
             </div>
           </div>
@@ -145,6 +148,16 @@ const Products = React.memo(() => {
                   hover:bg-slate-900 duration-200 items-center justify-center absolute top-[80%] left-3
                   `}
                       onClick={() => {
+                        {
+                          status.error === 0 &&
+                            dispatch(
+                              fetchAddToCart({
+                                id_product: product.id,
+                                quantity: 1,
+                                price: product.price,
+                              })
+                            );
+                        }
                         dispatch(
                           addProduct({
                             id: product.id,

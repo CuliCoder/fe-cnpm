@@ -1,6 +1,4 @@
 import React, { useEffect } from "react";
-import { Toast } from "flowbite-react";
-import { HiX } from "react-icons/hi";
 import { AiOutlineUser } from "react-icons/ai";
 import { AiOutlineSearch } from "react-icons/ai";
 import { LiaTimesSolid } from "react-icons/lia";
@@ -11,19 +9,24 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteProduct, removeFromCart } from "../../Slice/cartSlice";
 import { formatPrice } from "../../config/formatPrice";
+import { setShowToast } from "../../Slice/MyToastSlice";
 import logo from "../../Images/Comi_shop_logo.png";
 import "./header.css";
+
 export default function Header() {
   const productInCart = useSelector((state) => state.cart.getCart.items);
   const dispatch = useDispatch();
   const [enable, setEnable] = useState("hidden");
   const [hasproducts, setHasProducts] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
-  const [showToast, setShowToast] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [searchValue, setSearchValue] = useState("");
   const [status_login, setStatus_login] = useState(false);
   const status = useSelector((state) => state.status);
+  const authors = useSelector((state) => state.author.authors);
+  useEffect(() => {
+    console.log(authors);
+  }, [authors]);
   const navigate = useNavigate();
   useEffect(() => {
     setStatus_login(status.error === 0);
@@ -75,21 +78,11 @@ export default function Header() {
                 <div className="col-1">
                   <p className="title font-bold">TÁC GIẢ TIÊU BIỂU</p>
                   <ul>
-                    <Link to="/author/1">
-                      <li className="mt-7">Đặng Ngọc Minh Trang</li>
+                    {authors.map((author) => (
+                      <Link to={"/author/"+author.id}>
+                      <li className="mt-7">{author.name}</li>
                     </Link>
-                    <Link to="/author/3">
-                      <li className="mt-7">Châu Chặt Chém</li>
-                    </Link>
-                    <Link to="/author/5">
-                      <li className="mt-7">Dương Thạch Thảo (Nie)</li>
-                    </Link>
-                    <Link to="/author/2">
-                      <li className="mt-7">Can Tiểu Hy</li>
-                    </Link>
-                    <Link to="/author/4">
-                      <li className="mt-7">Dương Minh Đức</li>
-                    </Link>
+                    ))}
                   </ul>
                 </div>
                 <div className="col-2">
@@ -235,17 +228,6 @@ export default function Header() {
             {hasproducts ? (
               <div>
                 <div className="cart-mini relative">
-                  {showToast && (
-                    <Toast className="absolute top-10 right-5">
-                      <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
-                        <HiX className="h-5 w-5" />
-                      </div>
-                      <div className="ml-3 text-sm font-normal">
-                        Xóa sản phẩm thành công
-                      </div>
-                      <Toast.Toggle onDismiss={() => setShowToast(false)} />
-                    </Toast>
-                  )}
                   {/* Item */}
                   {productInCart.map((product) => (
                     <div className="flex justify-between mb-3" key={product.id}>
@@ -263,10 +245,13 @@ export default function Header() {
                         className="w-3 h-3 border border-current flex justify-center items-center hover:border-orange-600 hover:cursor-pointer"
                         onClick={() => {
                           dispatch(deleteProduct(product));
-                          setShowToast(true);
-                          setTimeout(() => {
-                            setShowToast(false);
-                          }, 3000);
+                          dispatch(
+                            setShowToast({
+                              show: true,
+                              message: "Xóa sản phẩm thành công",
+                              type: "success",
+                            })
+                          );
                           {
                             status.error === 0 &&
                               dispatch(removeFromCart(product.id));
