@@ -31,6 +31,12 @@ export default function Login() {
   if (status.loading) {
     return <Spinner />;
   }
+
+  const handlePressEnter = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
   return (
     <div>
       {loading && <Spinner />}
@@ -75,10 +81,11 @@ export default function Login() {
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e)=>{
-              if(e.key == 'Enter'){
+            onKeyDown={(e) => {
+              if (e.key == "Enter") {
                 handleLogin();
-            }}}
+              }
+            }}
             name=""
             id=""
             autoComplete="off"
@@ -97,10 +104,11 @@ export default function Login() {
             className="hidden"
             value={showPassword}
             onChange={() => setShowPassword((prev) => !prev)}
-            onKeyDown={(e)=>{
-              if(e.key == 'Enter'){
+            onKeyDown={(e) => {
+              if (e.key == "Enter") {
                 handleLogin();
-            }}}
+              }
+            }}
           />
 
           <input
