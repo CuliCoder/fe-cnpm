@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Sidebar, Button, Modal, Accordion, Badge } from "flowbite-react";
-import axios from "axios";
 import { IoLocation } from "react-icons/io5";
 import { BiSolidCoupon } from "react-icons/bi";
 import { IoCheckmarkCircle } from "react-icons/io5";
@@ -16,12 +15,15 @@ import {
   fetchCouponUser,
   fetchInfoUser,
   fetchOrderUser,
+  fetchChangeInfo,
+  clearChagneInfo,
 } from "../../Slice/userSlice";
 import { fetchAddressWithId } from "../../Slice/addressSlice";
 import { formatPrice } from "../../config/formatPrice";
 import "./MyAccount.css";
 import { handleCopyToClipboard } from "../../config/copyToClipboard";
 import { clearCart } from "../../Slice/cartSlice";
+import { setShowToast } from "../../Slice/MyToastSlice";
 
 export default function MyAccount() {
   const [account, setAccount] = useState(true);
@@ -43,6 +45,7 @@ export default function MyAccount() {
   const allOrderUser = useSelector((state) => state.user.order);
   const userCoupon = useSelector((state) => state.user.coupon);
   const userAddress = useSelector((state) => state.address);
+  const userChangeInfo = useSelector((state) => state.user.changeInfo);
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -79,14 +82,93 @@ export default function MyAccount() {
       setFullName(userInfo.info.fullname);
     }
   }, [userInfo.info]);
-
+  useEffect(() => {
+    if (!userChangeInfo.loading && userChangeInfo.error !== null) {
+      setPassword("");
+      setRePass1("");
+      setRePass2("");
+      dispatch(
+        setShowToast({
+          show: true,
+          type: userChangeInfo.error !== 0 ? "error" : "success",
+          message: userChangeInfo.message,
+        })
+      );
+      dispatch(clearChagneInfo());
+    }
+  }, [userChangeInfo.error, userChangeInfo.loading]);
   const handleChangeInfo = () => {
     let rgName =
       /^(?!\s*$)[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+$/;
-    if (!rgName.test(fullName)) {
-      alert("Vui lòng nhập đầy đủ thông tin");
+    if (!firstName || !lastName || !fullName) {
+      dispatch(
+        setShowToast({
+          show: true,
+          type: "error",
+          message: "First name, last name, display name là bắt buộc",
+        })
+      );
       return;
     }
+    if (
+      !rgName.test(fullName) ||
+      !rgName.test(firstName) ||
+      !rgName.test(lastName)
+    ) {
+      dispatch(
+        setShowToast({
+          show: true,
+          type: "error",
+          message:
+            "First name, last name, display name không được có kí tự đặc biệt",
+        })
+      );
+      return;
+    }
+    if (password || rePass1 || rePass2) {
+      if (!password || !rePass1 || !rePass2) {
+        dispatch(
+          setShowToast({
+            show: true,
+            type: "error",
+            message: "Mật khẩu không được để trống",
+          })
+        );
+        return;
+      }
+      let rgPass = /^(?=.*[A-Z]).{8,}$/;
+      if (!rgPass.test(rePass1)) {
+        dispatch(
+          setShowToast({
+            show: true,
+            type: "error",
+            message:
+              "Mật khẩu phải có ít nhất 8 ký tự, trong đó có ít nhất 1 ký tự viết hoa",
+          })
+        );
+        return;
+      }
+      if (rePass1 !== rePass2) {
+        dispatch(
+          setShowToast({
+            show: true,
+            type: "error",
+            message: "Mật khẩu không trùng khớp",
+          })
+        );
+        return;
+      }
+    }
+    dispatch(
+      fetchChangeInfo({
+        firstName,
+        lastName,
+        fullName,
+        password,
+        newPassword: rePass1,
+        repeatPassword: rePass2,
+      })
+    );
   };
 
   return (

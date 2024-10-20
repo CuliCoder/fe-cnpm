@@ -35,17 +35,20 @@ export const fetchCouponUser = createAsyncThunk(
     }
   }
 );
-export const fetchChangePassword = createAsyncThunk(
-  "user/fetchChangePassword",
+export const fetchChangeInfo = createAsyncThunk(
+  "user/fetchChangeInfo",
   async (
-    { current_password, new_password, repeat_password },
+    { firstName, lastName, fullName, password, newPassword, repeatPassword },
     { _, rejectWithValue }
   ) => {
     try {
-      const response = await axios.post("/api/user/changePassword", {
-        current_password,
-        new_password,
-        repeat_password,
+      const response = await axios.put("/api/user/info/edit", {
+        firstName,
+        lastName,
+        fullName,
+        password,
+        newPassword,
+        repeatPassword,
       });
       return response.data;
     } catch (error) {
@@ -68,13 +71,18 @@ const userSlice = createSlice({
       loading: false,
       coupons: [],
     },
-    changePassword: {
+    changeInfo: {
       loading: false,
       error: null,
       message: null,
     },
   },
-  reducers: {},
+  reducers: {
+    clearChagneInfo: (state) => {
+      state.changeInfo.error = null;
+      state.changeInfo.message = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchInfoUser.pending, (state) => {
@@ -107,17 +115,20 @@ const userSlice = createSlice({
       .addCase(fetchCouponUser.rejected, (state) => {
         state.coupon.loading = false;
       })
-      .addCase(fetchChangePassword.pending, (state) => {
-        state.changePassword.loading = true;
+      .addCase(fetchChangeInfo.pending, (state) => {
+        state.changeInfo.loading = true;
       })
-      .addCase(fetchChangePassword.fulfilled, (state, action) => {
-        state.changePassword.error = action.payload.error;
-        state.changePassword.message = action.payload.message;
-        state.changePassword.loading = false;
+      .addCase(fetchChangeInfo.fulfilled, (state, action) => {
+        state.changeInfo.error = action.payload.error;
+        state.changeInfo.message = action.payload.message;
+        state.changeInfo.loading = false;
       })
-      .addCase(fetchChangePassword.rejected, (state) => {
-        state.changePassword.loading = false;
+      .addCase(fetchChangeInfo.rejected, (state, action) => {
+        state.changeInfo.loading = false;
+        state.changeInfo.message = action.payload.message;
+        state.changeInfo.loading = false;
       });
   },
 });
 export default userSlice.reducer;
+export const { clearChagneInfo } = userSlice.actions;

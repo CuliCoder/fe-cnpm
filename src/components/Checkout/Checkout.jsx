@@ -9,8 +9,7 @@ import { FaCartPlus } from "react-icons/fa";
 import "./Checkout.css";
 import axiosConfig from "../../config/configAxios.js";
 import { formatPrice } from "../../config/formatPrice.js";
-
-export default function Checkout() {
+const Checkout = React.memo(() => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -31,7 +30,6 @@ export default function Checkout() {
   const [isLoad, setLoad] = useState(false);
   const [isToast, setToast] = useState(false);
   const userInfo = useSelector((state) => state.user.information);
-
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
@@ -422,4 +420,5 @@ export default function Checkout() {
       </div>
     </div>
   );
-}
+});
+export default Checkout;

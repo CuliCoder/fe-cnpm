@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { Toast } from "flowbite-react";
-import { HiX } from "react-icons/hi";
 import { FaTimes } from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
@@ -16,15 +15,15 @@ import {
   removeFromCart,
 } from "../../Slice/cartSlice";
 import { formatPrice } from "../../config/formatPrice";
-
+import { setShowToast } from "../../Slice/MyToastSlice";
 export default function Cart() {
   const itemsOfCart = useSelector((state) => state.cart.getCart.items);
-  const [showToast, setShowToast] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [status_login, setStatus_login] = useState(false);
   const status = useSelector((state) => state.status);
   const products = useSelector((state) => state.products.products_page);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const increaseItem = (item) => {
     const product = products.byUpdatedAt.find(
       (product) => product.id === item.id
@@ -57,20 +56,27 @@ export default function Cart() {
   useEffect(() => {
     setStatus_login(status.error === 0);
   }, [status.error]);
+  const handlePayment = () => {
+    const hasProduct = itemsOfCart.length > 0;
+    const isLogin = status_login;
+    if (!hasProduct || !isLogin) {
+      dispatch(
+        setShowToast({
+          show: true,
+          type: "error",
+          message: !isLogin
+            ? "Bạn cần đăng nhập để thanh toán"
+            : "Giỏ hàng của bạn đang trống",
+        })
+      );
+      navigate(!isLogin ? "/login" : "/products");
+      return;
+    }
+    navigate("/checkout");
+  };
   return (
     <div>
       <div className="cart relative">
-        {showToast && (
-          <Toast className="absolute top-[-200px] right-5">
-            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
-              <HiX className="h-5 w-5" />
-            </div>
-            <div className="ml-3 text-sm font-normal">
-              Xóa sản phẩm thành công
-            </div>
-            <Toast.Toggle onDismiss={() => setShowToast(false)} />
-          </Toast>
-        )}
         <div className="breadcrumb bg-[#f4f9fc] h-20 flex items-center justify-center">
           <a href="/" className="px-1">
             Trang Chủ
@@ -120,7 +126,13 @@ export default function Cart() {
                   className="product-cancel border p-1 mr-5"
                   onClick={() => {
                     dispatch(deleteProduct(item));
-                    setShowToast(true);
+                    dispatch(
+                      setShowToast({
+                        show: true,
+                        type: "success",
+                        message: "Xóa sản phẩm thành công",
+                      })
+                    );
                     {
                       status.error === 0 && dispatch(removeFromCart(item.id));
                     }
@@ -182,22 +194,15 @@ export default function Cart() {
                     {formatPrice(currentPrice)}
                   </span>
                 </div>
-                <Link
-                  to={
-                    itemsOfCart.length > 0
-                      ? status_login
-                        ? "/checkout"
-                        : "/login"
-                      : ""
-                  }
-                >
+                <div>
                   <button
                     type="button"
                     className="h-full w-[300px] bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200 mt-5 flex items-center justify-center "
+                    onClick={handlePayment}
                   >
                     <FaLock className="mr-2" /> TIẾN HÀNH THANH TOÁN
                   </button>
-                </Link>
+                </div>
               </div>
             </div>
           </div>

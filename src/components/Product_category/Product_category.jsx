@@ -15,7 +15,6 @@ const Product_category = React.memo(() => {
   const onPageChange = (page) => setCurrentPage(page);
   const [fillterValue, setFillterValue] = useState("");
   const [allProducts, setAllProducts] = useState();
-  const productInCart = useSelector((state) => state.cart.items);
   const [totalPages, setTotalPages] = useState(0);
   const [productsInCurrentPage, setProductsInCurrentPage] = useState();
   const [countProduct, setCountProduct] = useState();
@@ -87,7 +86,6 @@ const Product_category = React.memo(() => {
     let numFormat = formatter.format(number);
     return numFormat;
   };
-
   return (
     <div>
       <div className="products pb-[120px]">
@@ -101,9 +99,9 @@ const Product_category = React.memo(() => {
                 <Link to="/">Trang Chủ</Link>
               </Breadcrumb.Item>
               <Breadcrumb.Item>
-                <Link to="/products">
-                  {category_current && category_current.name}
-                </Link>{" "}
+                <div className="font-bold text-gray-800">
+                  {category_current && category_current.label}
+                </div>{" "}
               </Breadcrumb.Item>
             </div>
           </div>
