@@ -79,8 +79,8 @@ export default function Header() {
                   <p className="title font-bold">TÁC GIẢ TIÊU BIỂU</p>
                   <ul>
                     {authors.map((author) => (
-                      <Link to={"/author/"+author.id}>
-                      <li className="mt-7">{author.name}</li>
+                      <Link to={"/author/"+author.value}>
+                      <li className="mt-7">{author.label}</li>
                     </Link>
                     ))}
                   </ul>
