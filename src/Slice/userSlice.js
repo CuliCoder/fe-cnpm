@@ -109,7 +109,7 @@ const userSlice = createSlice({
         state.coupon.loading = true;
       })
       .addCase(fetchCouponUser.fulfilled, (state, action) => {
-        state.coupon.coupons = action.payload;
+        state.coupon.coupons = action.payload.coupons;
         state.coupon.loading = false;
       })
       .addCase(fetchCouponUser.rejected, (state) => {

@@ -24,9 +24,6 @@ export default function Header() {
   const [status_login, setStatus_login] = useState(false);
   const status = useSelector((state) => state.status);
   const authors = useSelector((state) => state.author.authors);
-  useEffect(() => {
-    console.log(authors);
-  }, [authors]);
   const navigate = useNavigate();
   useEffect(() => {
     setStatus_login(status.error === 0);

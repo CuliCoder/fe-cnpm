@@ -394,7 +394,7 @@ export default function MyAccount() {
                 </p>
                 <div className="border border-slate-600 p-5 rounded mt-4 grid grid-cols-2 gap-y-5">
                   {userInfo &&
-                    userCoupon.coupons.coupons.map((item) => {
+                    userCoupon.coupons.map((item) => {
                       if (Date.parse(item.expiration_date) > Date.now()) {
                         return (
                           <div className="w-[350px] h-[150px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-md relative shadow-lg shadow-pink-400/50 text-center p-[4px]">
