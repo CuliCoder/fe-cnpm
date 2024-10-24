@@ -394,45 +394,43 @@ export default function MyAccount() {
                 </p>
                 <div className="border border-slate-600 p-5 rounded mt-4 grid grid-cols-2 gap-y-5">
                   {userInfo &&
-                    userCoupon.coupons.coupons.map((item) => {
-                      return (
-                        <div className="w-[350px] h-[150px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-md relative shadow-lg shadow-pink-400/50 text-center p-[4px]">
-                          <div className="ml-[300px]">
-                            <img
-                              width="40"
-                              height="40"
-                              src="https://cdn-icons-png.flaticon.com/512/9528/9528844.png"
-                              alt="discount"
-                            />
+                    userCoupon.coupons.map((item) => {
+                      if (Date.parse(item.expiration_date) > Date.now()) {
+                        return (
+                          <div className="w-[350px] h-[150px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-md relative shadow-lg shadow-pink-400/50 text-center p-[4px]">
+                            <div className="ml-[300px]">
+                              <img
+                                width="40"
+                                height="40"
+                                src="https://cdn-icons-png.flaticon.com/512/9528/9528844.png"
+                                alt="discount"
+                              />
+                            </div>
+                            <p className="text-sm text-white">
+                              Mã giảm giá được áp dụng cho tất cả sản phẩm
+                            </p>
+                            <p className="text-[20px] mt-1 font-bold">
+                              {" "}
+                              {item.discount_value} Cho Giá Trị Hơn{" "}
+                              {formatPrice(item.value_apply)}
+                            </p>
+                            <p className="font-semibold">
+                              Mã: {item.coupon_code}{" "}
+                              <span
+                                className="border text-center bg-gray-300 leading-[8px] px-1 cursor-pointer"
+                                onClick={() => {
+                                  handleCopyToClipboard(item.coupon_code);
+                                }}
+                              >
+                                copy
+                              </span>
+                            </p>
+                            <p className="text-sm">
+                              Hạn sử dụng: {item.expiration_date}
+                            </p>
                           </div>
-                          <p className="text-sm text-white">
-                            Mã giảm giá được áp dụng cho tất cả sản phẩm
-                          </p>
-                          <p className="text-[20px] mt-1 font-bold">
-                            {" "}
-                            {item.discount_value} Cho Giá Trị Hơn{" "}
-                            {formatPrice(item.value_apply)}
-                          </p>
-                          <p className="font-semibold">
-                            Mã: {item.coupon_code}{" "}
-                            <span
-                              className="border text-center bg-gray-300 leading-[8px] px-1 cursor-pointer"
-                              onClick={() => {
-                                handleCopyToClipboard(item.coupon_code);
-                              }}
-                            >
-                              copy
-                            </span>
-                          </p>
-
-                          <p className="text-sm">
-                            Hạn sử dụng:{" "}
-                            {item.expiration_date != null
-                              ? item.expiration_date
-                              : "30 ngày sau"}
-                          </p>
-                        </div>
-                      );
+                        );
+                      }
                     })}
                 </div>
               </div>
@@ -466,8 +464,8 @@ export default function MyAccount() {
                   </div>
                 </div>
                 <div>
-                  {userAddress &&
-                    userAddress?.address.list[0][0].addressList.map((item) => (
+                  {userAddress.address.list.length > 0 &&
+                    userAddress.address.list[0][0].addressList?.map((item) => (
                       <p className="flex items-center mt-[20px]">
                         {item.address}{" "}
                         {item.default == "1" ? (

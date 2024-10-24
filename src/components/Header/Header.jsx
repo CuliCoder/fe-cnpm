@@ -24,9 +24,6 @@ export default function Header() {
   const [status_login, setStatus_login] = useState(false);
   const status = useSelector((state) => state.status);
   const authors = useSelector((state) => state.author.authors);
-  useEffect(() => {
-    console.log(authors);
-  }, [authors]);
   const navigate = useNavigate();
   useEffect(() => {
     setStatus_login(status.error === 0);
@@ -79,8 +76,8 @@ export default function Header() {
                   <p className="title font-bold">TÁC GIẢ TIÊU BIỂU</p>
                   <ul>
                     {authors.map((author) => (
-                      <Link to={"/author/"+author.id}>
-                      <li className="mt-7">{author.name}</li>
+                      <Link to={"/author/"+author.value}>
+                      <li className="mt-7">{author.label}</li>
                     </Link>
                     ))}
                   </ul>

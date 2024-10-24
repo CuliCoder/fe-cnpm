@@ -23,7 +23,7 @@ const authorSlice = createSlice({
       const { id } = action.payload;
       const authors = JSON.parse(JSON.stringify(state.authors));
       state.author_current = authors.find(
-        (author) => author.id === parseInt(id)
+        (author) => author.value === parseInt(id)
       );
     },
   },

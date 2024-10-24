@@ -13,7 +13,7 @@ import { formatPrice } from "../../config/formatPrice";
 import { fetchAddToCart } from "../../Slice/cartSlice";
 import { setShowToast } from "../../Slice/MyToastSlice";
 import "./ContentProduct.css";
-
+import "quill/dist/quill.snow.css";
 const ContentProduct = React.memo(() => {
   const [isSoldOut, setIsSoldOut] = useState(false);
   const dispatch = useDispatch();
@@ -213,11 +213,13 @@ const ContentProduct = React.memo(() => {
         </div>
         <div className="h-[1px] bg-slate-300 my-10 w-[1170px] m-auto"></div>
         <div className="desc w-[1170px] m-auto py-8 px-10 text-left border-slate-300 border rounded-[5px]">
-          {currentProduct && (
-            <div
-              dangerouslySetInnerHTML={{ __html: currentProduct.description }}
-            />
-          )}
+          <div className="ql-editor">
+            {currentProduct && (
+              <div
+                dangerouslySetInnerHTML={{ __html: currentProduct.description }}
+              />
+            )}
+          </div>
         </div>
         <div className="text-left w-[1170px] m-auto py-20">
           <h1 className="font-medium text-md">SẢN PHẨM LIÊN QUAN</h1>

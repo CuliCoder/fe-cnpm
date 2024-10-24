@@ -16,11 +16,17 @@ import {
 } from "../../Slice/cartSlice";
 import { formatPrice } from "../../config/formatPrice";
 import { setShowToast } from "../../Slice/MyToastSlice";
+import axios from "../../config/configAxios";
+
 export default function Cart() {
   const itemsOfCart = useSelector((state) => state.cart.getCart.items);
   const [currentPrice, setCurrentPrice] = useState(0);
+  const [currentDiscount, setCurrentDiscount] = useState(0);
+
   const [status_login, setStatus_login] = useState(false);
   const status = useSelector((state) => state.status);
+  const [discount, setDiscount] = useState("");
+
   const products = useSelector((state) => state.products.products_page);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -73,6 +79,34 @@ export default function Cart() {
       return;
     }
     navigate("/checkout");
+  };
+
+  const checkDiscountValid = async () => {
+    if (discount == "") {
+      setShowToast({
+        show: true,
+        type: "warning",
+        message: "Vui lòng nhập mã giảm giá",
+      });
+    } else {
+      let res = await axios.post(`/api/user/check-coupon`, {
+        coupon: discount.trim(),
+        value_apply: currentPrice,
+      });
+
+      if (res.status === 200) {
+        if (res.data[0]?.discount_value) {
+          const discountValue = parseFloat(
+            res.data[0].discount_value.replace("%", "")
+          );
+          const discountAmount = (currentPrice * discountValue) / 100;
+          setCurrentDiscount(discountAmount);
+          console.log(currentDiscount);
+        } else {
+          console.log(res.data);
+        }
+      }
+    }
   };
   return (
     <div>
@@ -150,11 +184,13 @@ export default function Cart() {
                 name=""
                 id=""
                 placeholder="Nhập mã giảm giá"
+                onChange={(e) => setDiscount(e.target.value)}
                 className="border-none outline-none w-[300px] px-2"
               />
               <button
                 type="button"
                 className="h-full w-28 bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200"
+                onClick={checkDiscountValid}
               >
                 Apply
               </button>
@@ -183,6 +219,12 @@ export default function Cart() {
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
+                  <p className="text-thin text-sm">Khuyến mãi</p>
+                  <span className="inline-block font-bold">
+                    - {formatPrice(currentDiscount)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
                   <p className="text-thin text-sm">Giao hàng</p>
                   <span className="inline-block font-bold">
                     Phí vận chuyển sẽ báo sau.
@@ -191,7 +233,7 @@ export default function Cart() {
                 <div className="flex justify-between items-center">
                   <p className="text-thin text-sm">Tổng</p>
                   <span className="inline-block font-bold">
-                    {formatPrice(currentPrice)}
+                    {formatPrice(currentPrice - currentDiscount)}
                   </span>
                 </div>
                 <div>

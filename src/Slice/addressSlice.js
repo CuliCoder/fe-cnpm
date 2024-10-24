@@ -28,6 +28,7 @@ const addressSlice = createSlice({
         state.address.loading = true;
       })
       .addCase(fetchAddressWithId.fulfilled, (state, action) => {
+        console.log(action.payload);
         state.address.list.push(action.payload);
         state.address.loading = false;
       })

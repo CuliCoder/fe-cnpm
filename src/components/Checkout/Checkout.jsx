@@ -29,7 +29,6 @@ const Checkout = React.memo(() => {
   const [currentPrice, setCurrentPrice] = useState(0);
   const [isLoad, setLoad] = useState(false);
   const [isToast, setToast] = useState(false);
-  const userInfo = useSelector((state) => state.user.information);
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
