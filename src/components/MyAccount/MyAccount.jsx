@@ -393,7 +393,7 @@ export default function MyAccount() {
                   Mã giảm giá của bạn
                 </p>
                 <div className="border border-slate-600 p-5 rounded mt-4 grid grid-cols-2 gap-y-5">
-                  {userInfo &&
+                  {userCoupon.coupons.length > 0 ? (
                     userCoupon.coupons.map((item) => {
                       if (Date.parse(item.expiration_date) > Date.now()) {
                         return (
@@ -431,7 +431,10 @@ export default function MyAccount() {
                           </div>
                         );
                       }
-                    })}
+                    })
+                  ) : (
+                    <div>Không có mã giảm giá</div>
+                  )}
                 </div>
               </div>
             )}
