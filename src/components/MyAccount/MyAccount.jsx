@@ -18,13 +18,14 @@ import {
   fetchChangeInfo,
   clearChagneInfo,
 } from "../../Slice/userSlice";
-import { fetchAddressWithId } from "../../Slice/addressSlice";
+import { fetchAddressWithId } from "../../Slice/userSlice";
 import { formatPrice } from "../../config/formatPrice";
 import "./MyAccount.css";
 import { handleCopyToClipboard } from "../../config/copyToClipboard";
 import { clearCart } from "../../Slice/cartSlice";
 import { setShowToast } from "../../Slice/MyToastSlice";
-
+import FormAddAddress from "./FormAddAddress";
+import RadioAddress from "./RadioAddress";
 export default function MyAccount() {
   const [account, setAccount] = useState(true);
   const [order, setOrder] = useState(false);
@@ -44,7 +45,7 @@ export default function MyAccount() {
   const userInfo = useSelector((state) => state.user.information);
   const allOrderUser = useSelector((state) => state.user.order);
   const userCoupon = useSelector((state) => state.user.coupon);
-  const userAddress = useSelector((state) => state.address);
+  const userAddress = useSelector((state) => state.user.address);
   const userChangeInfo = useSelector((state) => state.user.changeInfo);
   let navigate = useNavigate();
   const dispatch = useDispatch();
@@ -445,41 +446,33 @@ export default function MyAccount() {
                 <p className="font-thin text-base text-slate-500">
                   Địa chỉ này sẽ được làm địa chỉ mặc định để nhận hàng
                 </p>
-
-                <p className="mt-[30px]">
-                  Tên người nhận: <strong>{userInfo.info.fullname}</strong>
-                </p>
-                <p>
-                  Số điện thoại: <strong>{userInfo.info.phone_number}</strong>
-                </p>
-                <div>
-                  <div className="flex space-x-[400px]">
-                    <p>Địa Chỉ:</p>
-                    <button
-                      className="text-[#fd6d4f] flex items-center space-x-1"
-                      onClick={() => {
-                        setAddressForm(true);
-                      }}
-                    >
-                      <CiEdit className="fill-[#fd6e4f] " />
-                      <p>Sửa</p>
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  {userAddress.address.list.length > 0 &&
-                    userAddress.address.list[0][0].addressList?.map((item) => (
-                      <p className="flex items-center mt-[20px]">
-                        {item.address}{" "}
-                        {item.default == "1" ? (
-                          <div className="font-bold ml-4">Mặc Định</div>
-                        ) : null}
-                      </p>
-                    ))}
+                <button
+                  className="text-[#fd6d4f] flex items-center space-x-1"
+                  onClick={() => setAddressForm(true)}
+                >
+                  <CiEdit className="fill-[#fd6e4f] " />
+                  <span>Thêm</span>
+                </button>
+                <div className="container-address">
+                  {userAddress.list.length <= 0 ? (
+                    <div>Chưa có địa chỉ</div>
+                  ) : (
+                    userAddress.list[0].addressList?.map((item) => (
+                      <RadioAddress
+                        key={item.id}
+                        id={item.id}
+                        name={item.firstName + " " + item.lastName}
+                        phoneNumber={item.phoneNumber}
+                        address={`${item.detail}, ${item.ward}, ${item.district}, ${item.province}`}
+                        email={item.email}
+                        isDefault={item.default === "1" ? true : false}
+                      />
+                    ))
+                  )}
                 </div>
               </div>
             )}
-
+            <FormAddAddress show={addressForm} onClose={setAddressForm} />
             {infoAccount && (
               <div className="">
                 <div className="flex justify-between items-center">

@@ -23,7 +23,7 @@ const MyToast = ({ type, message }) => {
     }
   };
   return (
-    <Toast className="fixed top-50 right-5 z-50">
+    <Toast className="fixed top-50 right-5 z-9999">
       <div
         className={
           "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg " +

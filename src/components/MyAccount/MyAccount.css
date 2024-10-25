@@ -2,3 +2,45 @@
   display: grid;
   grid-template-columns: 200px auto;
 }
+.radio-address {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-radius: 10px;
+  border: solid 1px #e0e0e0;
+  padding: 20px;
+  max-width: 500px;
+}
+
+.container-rdo-address {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  user-select: none;
+}
+.rdo-address-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.container-rdo-address button {
+  user-select: none;
+}
+
+.container-rdo-address input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  user-select: none;
+}
+
+.container-rdo-address .selected {
+  border: solid 1px #f44336;
+}
+
+.container-address {
+  overflow-y: scroll;
+  max-height: 500px;
+}
