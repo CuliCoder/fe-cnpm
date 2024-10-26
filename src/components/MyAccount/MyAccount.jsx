@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Sidebar, Button, Modal, Accordion, Badge } from "flowbite-react";
 import { IoLocation } from "react-icons/io5";
 import { BiSolidCoupon } from "react-icons/bi";
@@ -17,6 +17,9 @@ import {
   fetchOrderUser,
   fetchChangeInfo,
   clearChagneInfo,
+  fetchSelectAddress,
+  clearSelectAddress,
+  clearAddAddress,
 } from "../../Slice/userSlice";
 import { fetchAddressWithId } from "../../Slice/userSlice";
 import { formatPrice } from "../../config/formatPrice";
@@ -26,7 +29,8 @@ import { clearCart } from "../../Slice/cartSlice";
 import { setShowToast } from "../../Slice/MyToastSlice";
 import FormAddAddress from "./FormAddAddress";
 import RadioAddress from "./RadioAddress";
-export default function MyAccount() {
+
+const MyAccount = React.memo(() => {
   const [account, setAccount] = useState(true);
   const [order, setOrder] = useState(false);
   const [address, setAddress] = useState(false);
@@ -47,6 +51,8 @@ export default function MyAccount() {
   const userCoupon = useSelector((state) => state.user.coupon);
   const userAddress = useSelector((state) => state.user.address);
   const userChangeInfo = useSelector((state) => state.user.changeInfo);
+  const selectAddress = useSelector((state) => state.user.selectAddress);
+  const addAddress = useSelector((state) => state.user.addAddress);
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -171,7 +177,36 @@ export default function MyAccount() {
       })
     );
   };
-
+  useEffect(() => {
+    if (addAddress.error === 0) {
+      setAddressForm(false);
+      dispatch(
+        setShowToast({
+          show: true,
+          message: addAddress.message,
+          type: "success",
+        })
+      );
+      dispatch(clearAddAddress());
+      dispatch(fetchAddressWithId());
+    }
+  }, [addAddress.error]);
+  useEffect(() => {
+    if (selectAddress.error !== null) {
+      dispatch(
+        setShowToast({
+          show: true,
+          message: selectAddress.message,
+          type: selectAddress.error === 1 ? "error" : "success",
+        })
+      );
+      dispatch(clearSelectAddress());
+      dispatch(fetchAddressWithId());
+    }
+  }, [selectAddress.error]);
+  const handleSelectAddress = useCallback((id) => {
+    dispatch(fetchSelectAddress(id));
+  }, []);
   return (
     <div>
       <div className="breadcrumb bg-[#f4f9fc] h-[110px] py-5 ">
@@ -453,23 +488,10 @@ export default function MyAccount() {
                   <CiEdit className="fill-[#fd6e4f] " />
                   <span>Thêm</span>
                 </button>
-                <div className="container-address">
-                  {userAddress.list.length <= 0 ? (
-                    <div>Chưa có địa chỉ</div>
-                  ) : (
-                    userAddress.list[0].addressList?.map((item) => (
-                      <RadioAddress
-                        key={item.id}
-                        id={item.id}
-                        name={item.firstName + " " + item.lastName}
-                        phoneNumber={item.phoneNumber}
-                        address={`${item.detail}, ${item.ward}, ${item.district}, ${item.province}`}
-                        email={item.email}
-                        isDefault={item.default === "1" ? true : false}
-                      />
-                    ))
-                  )}
-                </div>
+                <RadioAddress
+                  listAddress={userAddress.list}
+                  selectAddress={handleSelectAddress}
+                />
               </div>
             )}
             <FormAddAddress show={addressForm} onClose={setAddressForm} />
@@ -615,4 +637,5 @@ export default function MyAccount() {
       </div>
     </div>
   );
-}
+});
+export default MyAccount;

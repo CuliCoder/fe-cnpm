@@ -23,7 +23,7 @@ import { fetchAllCategory } from "./Slice/categorySlice";
 import { fetchCart } from "./Slice/cartSlice";
 import { fetchAllAuthor } from "./Slice/authorSlice.js";
 import Author from "./components/Author/Author.js";
-import axios from "./config/configAxios.js";
+
 function App() {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.status);
@@ -32,6 +32,9 @@ function App() {
   const getCart = useSelector((state) => state.cart.getCart);
   const itemsOfCart = useSelector((state) => state.cart.getCart.items);
   const addCart = useSelector((state) => state.cart.addCart);
+  const userAddress = useSelector((state) => state.user.address);
+  const userAddAddress = useSelector((state) => state.user.addAddress);
+  const userSelectAddress = useSelector((state) => state.user.selectAddress);
   useEffect(() => {
     dispatch(check_status());
     dispatch(fetchAllProducts());
@@ -51,6 +54,9 @@ function App() {
       {(products_page.loading ||
         category.loading ||
         getCart.loading ||
+        userAddress.loading ||
+        userAddAddress.loading ||
+        userSelectAddress.loading ||
         addCart.loading) && <Spinner />}
       <Routes>
         <Route

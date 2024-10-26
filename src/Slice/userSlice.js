@@ -99,6 +99,19 @@ export const fetchAddAddress = createAsyncThunk(
     }
   }
 );
+export const fetchSelectAddress = createAsyncThunk(
+  "user/fetchSelectAddress",
+  async (id_address, { _, rejectWithValue }) => {
+    try {
+      const response = await axios.put("/api/user/address/select", {
+        id_address,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -128,11 +141,24 @@ const userSlice = createSlice({
       error: null,
       message: null,
     },
+    selectAddress: {
+      loading: false,
+      error: null,
+      message: null,
+    },
   },
   reducers: {
     clearChagneInfo: (state) => {
       state.changeInfo.error = null;
       state.changeInfo.message = null;
+    },
+    clearSelectAddress: (state) => {
+      state.selectAddress.error = null;
+      state.selectAddress.message = null;
+    },
+    clearAddAddress: (state) => {
+      state.addAddress.error = null;
+      state.addAddress.message = null;
     },
   },
   extraReducers: (builder) => {
@@ -202,8 +228,22 @@ const userSlice = createSlice({
         state.addAddress.error = action.payload.error;
         state.addAddress.message = action.payload.message;
         state.addAddress.loading = false;
+      })
+      .addCase(fetchSelectAddress.pending, (state) => {
+        state.selectAddress.loading = true;
+      })
+      .addCase(fetchSelectAddress.fulfilled, (state, action) => {
+        state.selectAddress.error = action.payload.error;
+        state.selectAddress.message = action.payload.message;
+        state.selectAddress.loading = false;
+      })
+      .addCase(fetchSelectAddress.rejected, (state, action) => {
+        state.selectAddress.error = action.payload.error;
+        state.selectAddress.message = action.payload.message;
+        state.selectAddress.loading = false;
       });
   },
 });
 export default userSlice.reducer;
-export const { clearChagneInfo } = userSlice.actions;
+export const { clearChagneInfo, clearAddAddress, clearSelectAddress } =
+  userSlice.actions;

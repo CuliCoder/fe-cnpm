@@ -10,15 +10,21 @@
   border: solid 1px #e0e0e0;
   padding: 20px;
   max-width: 500px;
+  min-width: 500px;
 }
 
 .container-rdo-address {
   display: flex;
   flex-direction: row;
   gap: 10px;
-  margin-top: 20px;
-  margin-bottom: 20px;
   user-select: none;
+  cursor: pointer;
+}
+.container-rdo-address * {
+  cursor: pointer;
+}
+.container-rdo-address .rdo-address-btn {
+  cursor:auto;
 }
 .rdo-address-btn {
   display: flex;
@@ -41,6 +47,10 @@
 }
 
 .container-address {
-  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  overflow-y: auto;
   max-height: 500px;
+  gap:20px
 }

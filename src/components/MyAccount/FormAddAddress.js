@@ -8,7 +8,7 @@ import {
 } from "../../Slice/addressSlice";
 import { Button } from "flowbite-react";
 import { rgAddress, rgName, rgPhone, rgEmail } from "../../utils/regex";
-import { fetchAddAddress } from "../../Slice/userSlice";
+import { clearAddAddress, fetchAddAddress } from "../../Slice/userSlice";
 import MyToast from "../MyToast/MyToast";
 
 const FormAddAddress = React.memo(({ show, onClose }) => {
@@ -51,12 +51,13 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
     }
   }, [showToast]);
   React.useEffect(() => {
-    if (addAddress.error !== null) {
+    if (addAddress.error === 1) {
       setShowToast({
         show: true,
-        type: addAddress.error === 0 ? "success" : "error",
+        type: "error",
         message: addAddress.message,
       });
+      dispatch(clearAddAddress())
     }
   }, [addAddress.error]);
   React.useEffect(() => {
@@ -87,6 +88,7 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
       !phoneNumber ||
       !email ||
       !detailAddress ||
+      !detailAddress ||
       !Province.code ||
       !District.code ||
       !Ward.code
@@ -104,6 +106,9 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
     }
     if (!rgEmail.test(email)) {
       return "Email không hợp lệ";
+    }
+    if (!rgAddress.test(detailAddress)) {
+      return "Địa chỉ không hợp lệ";
     }
     return null;
   };
