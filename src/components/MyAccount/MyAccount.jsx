@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Sidebar, Button, Modal, Accordion, Badge } from "flowbite-react";
 import { IoLocation } from "react-icons/io5";
 import { BiSolidCoupon } from "react-icons/bi";
@@ -17,15 +17,20 @@ import {
   fetchOrderUser,
   fetchChangeInfo,
   clearChagneInfo,
+  fetchSelectAddress,
+  clearSelectAddress,
+  clearAddAddress,
 } from "../../Slice/userSlice";
-import { fetchAddressWithId } from "../../Slice/addressSlice";
+import { fetchAddressWithId } from "../../Slice/userSlice";
 import { formatPrice } from "../../config/formatPrice";
 import "./MyAccount.css";
 import { handleCopyToClipboard } from "../../config/copyToClipboard";
 import { clearCart } from "../../Slice/cartSlice";
 import { setShowToast } from "../../Slice/MyToastSlice";
+import FormAddAddress from "./FormAddAddress";
+import RadioAddress from "./RadioAddress";
 
-export default function MyAccount() {
+const MyAccount = React.memo(() => {
   const [account, setAccount] = useState(true);
   const [order, setOrder] = useState(false);
   const [address, setAddress] = useState(false);
@@ -44,8 +49,10 @@ export default function MyAccount() {
   const userInfo = useSelector((state) => state.user.information);
   const allOrderUser = useSelector((state) => state.user.order);
   const userCoupon = useSelector((state) => state.user.coupon);
-  const userAddress = useSelector((state) => state.address);
+  const userAddress = useSelector((state) => state.user.address);
   const userChangeInfo = useSelector((state) => state.user.changeInfo);
+  const selectAddress = useSelector((state) => state.user.selectAddress);
+  const addAddress = useSelector((state) => state.user.addAddress);
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -170,7 +177,36 @@ export default function MyAccount() {
       })
     );
   };
-
+  useEffect(() => {
+    if (addAddress.error === 0) {
+      setAddressForm(false);
+      dispatch(
+        setShowToast({
+          show: true,
+          message: addAddress.message,
+          type: "success",
+        })
+      );
+      dispatch(clearAddAddress());
+      dispatch(fetchAddressWithId());
+    }
+  }, [addAddress.error]);
+  useEffect(() => {
+    if (selectAddress.error !== null) {
+      dispatch(
+        setShowToast({
+          show: true,
+          message: selectAddress.message,
+          type: selectAddress.error === 1 ? "error" : "success",
+        })
+      );
+      dispatch(clearSelectAddress());
+      dispatch(fetchAddressWithId());
+    }
+  }, [selectAddress.error]);
+  const handleSelectAddress = useCallback((id) => {
+    dispatch(fetchSelectAddress(id));
+  }, []);
   return (
     <div>
       <div className="breadcrumb bg-[#f4f9fc] h-[110px] py-5 ">
@@ -393,7 +429,7 @@ export default function MyAccount() {
                   Mã giảm giá của bạn
                 </p>
                 <div className="border border-slate-600 p-5 rounded mt-4 grid grid-cols-2 gap-y-5">
-                  {userInfo &&
+                  {userCoupon.coupons.length > 0 ? (
                     userCoupon.coupons.map((item) => {
                       if (Date.parse(item.expiration_date) > Date.now()) {
                         return (
@@ -431,7 +467,10 @@ export default function MyAccount() {
                           </div>
                         );
                       }
-                    })}
+                    })
+                  ) : (
+                    <div>Không có mã giảm giá</div>
+                  )}
                 </div>
               </div>
             )}
@@ -442,41 +481,20 @@ export default function MyAccount() {
                 <p className="font-thin text-base text-slate-500">
                   Địa chỉ này sẽ được làm địa chỉ mặc định để nhận hàng
                 </p>
-
-                <p className="mt-[30px]">
-                  Tên người nhận: <strong>{userInfo.info.fullname}</strong>
-                </p>
-                <p>
-                  Số điện thoại: <strong>{userInfo.info.phone_number}</strong>
-                </p>
-                <div>
-                  <div className="flex space-x-[400px]">
-                    <p>Địa Chỉ:</p>
-                    <button
-                      className="text-[#fd6d4f] flex items-center space-x-1"
-                      onClick={() => {
-                        setAddressForm(true);
-                      }}
-                    >
-                      <CiEdit className="fill-[#fd6e4f] " />
-                      <p>Sửa</p>
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  {userAddress.address.list.length > 0 &&
-                    userAddress.address.list[0][0].addressList?.map((item) => (
-                      <p className="flex items-center mt-[20px]">
-                        {item.address}{" "}
-                        {item.default == "1" ? (
-                          <div className="font-bold ml-4">Mặc Định</div>
-                        ) : null}
-                      </p>
-                    ))}
-                </div>
+                <button
+                  className="text-[#fd6d4f] flex items-center space-x-1"
+                  onClick={() => setAddressForm(true)}
+                >
+                  <CiEdit className="fill-[#fd6e4f] " />
+                  <span>Thêm</span>
+                </button>
+                <RadioAddress
+                  listAddress={userAddress.list}
+                  selectAddress={handleSelectAddress}
+                />
               </div>
             )}
-
+            <FormAddAddress show={addressForm} onClose={setAddressForm} />
             {infoAccount && (
               <div className="">
                 <div className="flex justify-between items-center">
@@ -619,4 +637,5 @@ export default function MyAccount() {
       </div>
     </div>
   );
-}
+});
+export default MyAccount;

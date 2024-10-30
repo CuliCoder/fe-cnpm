@@ -35,6 +35,17 @@ export const fetchCouponUser = createAsyncThunk(
     }
   }
 );
+export const fetchAddressWithId = createAsyncThunk(
+  "address/fetchAddressWithId",
+  async (_, rejectWithValue) => {
+    try {
+      const response = await axios.get(`/api/user/address`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 export const fetchChangeInfo = createAsyncThunk(
   "user/fetchChangeInfo",
   async (
@@ -49,6 +60,51 @@ export const fetchChangeInfo = createAsyncThunk(
         password,
         newPassword,
         repeatPassword,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const fetchAddAddress = createAsyncThunk(
+  "user/fetchAddAddress",
+  async (
+    {
+      phone_number,
+      email,
+      firstName,
+      lastName,
+      province,
+      district,
+      ward,
+      detail,
+    },
+    { _, rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.post("/api/user/add-address", {
+        phone_number,
+        email,
+        firstName,
+        lastName,
+        province,
+        district,
+        ward,
+        detail,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const fetchSelectAddress = createAsyncThunk(
+  "user/fetchSelectAddress",
+  async (id_address, { _, rejectWithValue }) => {
+    try {
+      const response = await axios.put("/api/user/address/select", {
+        id_address,
       });
       return response.data;
     } catch (error) {
@@ -76,12 +132,34 @@ const userSlice = createSlice({
       error: null,
       message: null,
     },
+    address: {
+      loading: false,
+      list: [],
+    },
+    addAddress: {
+      loading: false,
+      error: null,
+      message: null,
+    },
+    selectAddress: {
+      loading: false,
+      error: null,
+      message: null,
+    },
   },
   reducers: {
     clearChagneInfo: (state) => {
       state.changeInfo.error = null;
       state.changeInfo.message = null;
-    }
+    },
+    clearSelectAddress: (state) => {
+      state.selectAddress.error = null;
+      state.selectAddress.message = null;
+    },
+    clearAddAddress: (state) => {
+      state.addAddress.error = null;
+      state.addAddress.message = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -127,8 +205,45 @@ const userSlice = createSlice({
         state.changeInfo.loading = false;
         state.changeInfo.message = action.payload.message;
         state.changeInfo.loading = false;
+      })
+      .addCase(fetchAddressWithId.pending, (state) => {
+        state.address.loading = true;
+      })
+      .addCase(fetchAddressWithId.fulfilled, (state, action) => {
+        if (action.payload.length > 0) state.address.list = action.payload;
+        state.address.loading = false;
+      })
+      .addCase(fetchAddressWithId.rejected, (state) => {
+        state.address.loading = false;
+      })
+      .addCase(fetchAddAddress.pending, (state) => {
+        state.addAddress.loading = true;
+      })
+      .addCase(fetchAddAddress.fulfilled, (state, action) => {
+        state.addAddress.error = action.payload.error;
+        state.addAddress.message = action.payload.message;
+        state.addAddress.loading = false;
+      })
+      .addCase(fetchAddAddress.rejected, (state, action) => {
+        state.addAddress.error = action.payload.error;
+        state.addAddress.message = action.payload.message;
+        state.addAddress.loading = false;
+      })
+      .addCase(fetchSelectAddress.pending, (state) => {
+        state.selectAddress.loading = true;
+      })
+      .addCase(fetchSelectAddress.fulfilled, (state, action) => {
+        state.selectAddress.error = action.payload.error;
+        state.selectAddress.message = action.payload.message;
+        state.selectAddress.loading = false;
+      })
+      .addCase(fetchSelectAddress.rejected, (state, action) => {
+        state.selectAddress.error = action.payload.error;
+        state.selectAddress.message = action.payload.message;
+        state.selectAddress.loading = false;
       });
   },
 });
 export default userSlice.reducer;
-export const { clearChagneInfo } = userSlice.actions;
+export const { clearChagneInfo, clearAddAddress, clearSelectAddress } =
+  userSlice.actions;
