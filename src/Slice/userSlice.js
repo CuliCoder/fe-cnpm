@@ -83,7 +83,7 @@ export const fetchAddAddress = createAsyncThunk(
     { _, rejectWithValue }
   ) => {
     try {
-      const response = await axios.post("/api/user/add-address", {
+      const response = await axios.post("/api/user/address/add", {
         phone_number,
         email,
         firstName,
@@ -105,6 +105,38 @@ export const fetchSelectAddress = createAsyncThunk(
     try {
       const response = await axios.put("/api/user/address/select", {
         id_address,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const fetchEditAddress = createAsyncThunk(
+  "user/fetchEditAddress",
+  async (
+    {
+      phone_number,
+      email,
+      firstName,
+      lastName,
+      province,
+      district,
+      ward,
+      detail,
+    },
+    { _, rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.put("/api/user/address/edit", {
+        phone_number,
+        email,
+        firstName,
+        lastName,
+        province,
+        district,
+        ward,
+        detail,
       });
       return response.data;
     } catch (error) {
@@ -146,6 +178,11 @@ const userSlice = createSlice({
       error: null,
       message: null,
     },
+    editAddress: {
+      loading: false,
+      error: null,
+      message: null,
+    },
   },
   reducers: {
     clearChagneInfo: (state) => {
@@ -159,6 +196,10 @@ const userSlice = createSlice({
     clearAddAddress: (state) => {
       state.addAddress.error = null;
       state.addAddress.message = null;
+    },
+    clearEditAddress: (state) => {
+      state.editAddress.error = null;
+      state.editAddress.message = null;
     },
   },
   extraReducers: (builder) => {
@@ -241,9 +282,26 @@ const userSlice = createSlice({
         state.selectAddress.error = action.payload.error;
         state.selectAddress.message = action.payload.message;
         state.selectAddress.loading = false;
+      })
+      .addCase(fetchEditAddress.pending, (state) => {
+        state.selectAddress.loading = true;
+      })
+      .addCase(fetchEditAddress.fulfilled, (state, action) => {
+        state.selectAddress.error = action.payload.error;
+        state.selectAddress.message = action.payload.message;
+        state.selectAddress.loading = false;
+      })
+      .addCase(fetchEditAddress.rejected, (state, action) => {
+        state.selectAddress.error = action.payload.error;
+        state.selectAddress.message = action.payload.message;
+        state.selectAddress.loading = false;
       });
   },
 });
 export default userSlice.reducer;
-export const { clearChagneInfo, clearAddAddress, clearSelectAddress } =
-  userSlice.actions;
+export const {
+  clearChagneInfo,
+  clearAddAddress,
+  clearSelectAddress,
+  clearEditAddress,
+} = userSlice.actions;

@@ -23,7 +23,11 @@ import { fetchAllCategory } from "./Slice/categorySlice";
 import { fetchCart } from "./Slice/cartSlice";
 import { fetchAllAuthor } from "./Slice/authorSlice.js";
 import Author from "./components/Author/Author.js";
-
+import {
+  fetchProvinces,
+  fetchDistricts,
+  fetchWards,
+} from "./Slice/addressSlice.js";
 function App() {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.status);
@@ -40,6 +44,9 @@ function App() {
     dispatch(fetchAllProducts());
     dispatch(fetchAllCategory());
     dispatch(fetchAllAuthor());
+    dispatch(fetchProvinces());
+    dispatch(fetchDistricts());
+    dispatch(fetchWards());
   }, []);
   useEffect(() => {
     if (status.error === 0) {

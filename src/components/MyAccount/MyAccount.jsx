@@ -20,6 +20,7 @@ import {
   fetchSelectAddress,
   clearSelectAddress,
   clearAddAddress,
+  clearEditAddress,
 } from "../../Slice/userSlice";
 import { fetchAddressWithId } from "../../Slice/userSlice";
 import { formatPrice } from "../../config/formatPrice";
@@ -29,6 +30,7 @@ import { clearCart } from "../../Slice/cartSlice";
 import { setShowToast } from "../../Slice/MyToastSlice";
 import FormAddAddress from "./FormAddAddress";
 import RadioAddress from "./RadioAddress";
+import FormEditAddress from "./FromEditAddress";
 
 const MyAccount = React.memo(() => {
   const [account, setAccount] = useState(true);
@@ -38,6 +40,8 @@ const MyAccount = React.memo(() => {
   const [discount, setDiscount] = useState(false);
 
   const [addressForm, setAddressForm] = useState(false);
+  const [editAddress, setEditAddress] = useState(null);
+  const [openEditAddressForm, setOpenEditAddressForm] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
   const [firstName, setFirstName] = useState("");
@@ -53,6 +57,7 @@ const MyAccount = React.memo(() => {
   const userChangeInfo = useSelector((state) => state.user.changeInfo);
   const selectAddress = useSelector((state) => state.user.selectAddress);
   const addAddress = useSelector((state) => state.user.addAddress);
+  const usereditAddress = useSelector((state) => state.user.editAddress);
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -192,6 +197,20 @@ const MyAccount = React.memo(() => {
     }
   }, [addAddress.error]);
   useEffect(() => {
+    if (usereditAddress.error === 0) {
+      setOpenEditAddressForm(false);
+      dispatch(
+        setShowToast({
+          show: true,
+          message: usereditAddress.message,
+          type: "success",
+        })
+      );
+      dispatch(clearEditAddress());
+      dispatch(fetchAddressWithId());
+    }
+  }, [addAddress.error]);
+  useEffect(() => {
     if (selectAddress.error !== null) {
       dispatch(
         setShowToast({
@@ -206,6 +225,10 @@ const MyAccount = React.memo(() => {
   }, [selectAddress.error]);
   const handleSelectAddress = useCallback((id) => {
     dispatch(fetchSelectAddress(id));
+  }, []);
+  const setShowFormEditAddress = useCallback((show, item) => {
+    setOpenEditAddressForm(show);
+    setEditAddress(item);
   }, []);
   return (
     <div>
@@ -491,10 +514,16 @@ const MyAccount = React.memo(() => {
                 <RadioAddress
                   listAddress={userAddress.list}
                   selectAddress={handleSelectAddress}
+                  editAddress={setShowFormEditAddress}
                 />
               </div>
             )}
             <FormAddAddress show={addressForm} onClose={setAddressForm} />
+            <FormEditAddress
+              show={editAddress}
+              onClose={openEditAddressForm}
+              address={editAddress}
+            />
             {infoAccount && (
               <div className="">
                 <div className="flex justify-between items-center">

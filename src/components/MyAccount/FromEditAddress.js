@@ -1,12 +1,11 @@
-import { Modal } from "flowbite-react";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "flowbite-react";
 import { rgAddress, rgName, rgPhone, rgEmail } from "../../utils/regex";
-import { clearAddAddress, fetchAddAddress } from "../../Slice/userSlice";
 import MyToast from "../MyToast/MyToast";
-
-const FormAddAddress = React.memo(({ show, onClose }) => {
+import { Modal } from "flowbite-react";
+import { fetchEditAddress ,clearEditAddress } from "../../Slice/userSlice";
+const FormEditAddress = React.memo(({ show, onClose, address }) => {
   const [showToast, setShowToast] = React.useState({
     show: false,
     type: null,
@@ -34,6 +33,41 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
   const dataDistrict = useSelector((state) => state.address.districts);
   const dataWards = useSelector((state) => state.address.wards);
   const addAddress = useSelector((state) => state.user.addAddress);
+  const userAddress = useSelector((state) => state.user.address);
+  const [isChange, setIsChange] = React.useState(false);
+  const userEditAddress = useSelector((state) => state.user.editAddress);
+  React.useEffect(() => {
+    if (userAddress.list.length > 0 && address) {
+      if (address) {
+        setLastName(address.lastName);
+        setFirstName(address.firstName);
+        setPhoneNumber(address.phoneNumber);
+        setEmail(address.email);
+        const province = dataProvince.find((item) => {
+          return item.name === address.province;
+        });
+        setProvince({
+          code: province.code,
+          name: province.name,
+        });
+        const district = dataDistrict.find((item) => {
+          return item.name === address.district;
+        });
+        setDistrict({
+          code: district.code,
+          name: district.name,
+        });
+        const ward = dataWards.find((item) => {
+          return item.name === address.ward;
+        });
+        setWard({
+          code: ward.code,
+          name: ward.name,
+        });
+        setdetailAddress(address.detail);
+      }
+    }
+  }, [userAddress.list, address]);
   React.useEffect(() => {
     if (showToast.show) {
       setTimeout(() => {
@@ -52,11 +86,11 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
         type: "error",
         message: addAddress.message,
       });
-      dispatch(clearAddAddress());
+      dispatch(clearEditAddress());
     }
   }, [addAddress.error]);
   React.useEffect(() => {
-    if (Province.code) {
+    if (Province.code && isChange) {
       setDistrict({
         code: null,
         name: null,
@@ -64,13 +98,16 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
     }
   }, [Province.code]);
   React.useEffect(() => {
-    if (District.code) {
+    if (District.code && isChange) {
       setWard({
         code: null,
         name: null,
       });
     }
   }, [District.code]);
+  React.useEffect(() => {
+    setIsChange(false);
+  }, [show]);
   const checkValid = () => {
     if (
       !lastName ||
@@ -102,7 +139,7 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
     }
     return null;
   };
-  const handleAddAddress = () => {
+  const handleEditAddress = () => {
     const valid = checkValid();
     if (valid) {
       setShowToast({
@@ -113,7 +150,7 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
       return;
     }
     dispatch(
-      fetchAddAddress({
+      fetchEditAddress({
         phone_number: phoneNumber,
         email,
         firstName,
@@ -132,7 +169,7 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
           <MyToast type={showToast.type} message={showToast.message} />
         )}
         <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-          <strong>Thêm địa chỉ nhận hàng</strong>
+          <strong>Sửa địa chỉ nhận hàng</strong>
         </Modal.Header>
         <Modal.Body className="p-6 dark:bg-gray-800">
           <div className="p-4">
@@ -225,23 +262,34 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
                     onChange={(e) => {
                       const Province = JSON.parse(e.target.value);
                       setProvince(Province);
+                      setIsChange(true);
                     }}
                     className="block h-[40px] border-slate-200 focus:ring-0 w-[230px] mt-1"
                   >
-                    <option value="" defaultValue>
+                    <option
+                      value={JSON.stringify({
+                        code: null,
+                        name: null,
+                      })}
+                      defaultValue
+                    >
                       Chọn tỉnh thành
                     </option>
-                    {dataProvince.map((item) => (
-                      <option
-                        key={item.code}
-                        value={JSON.stringify({
-                          code: item.code,
-                          name: item.name,
-                        })}
-                      >
-                        {item.name}
-                      </option>
-                    ))}
+                    {address &&
+                      dataProvince.map((item) => {
+                        return (
+                          <option
+                            key={item.code}
+                            value={JSON.stringify({
+                              code: item.code,
+                              name: item.name,
+                            })}
+                            selected={item.name === address.province}
+                          >
+                            {item.name}
+                          </option>
+                        );
+                      })}
                   </select>
                 </div>
 
@@ -255,13 +303,21 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
                     onChange={(e) => {
                       const District = JSON.parse(e.target.value);
                       setDistrict(District);
+                      setIsChange(true);
                     }}
                     className="block h-[40px] border-slate-200 focus:ring-0 w-[230px] mt-1"
                   >
-                    <option value="" defaultValue>
+                    <option
+                      value={JSON.stringify({
+                        code: null,
+                        name: null,
+                      })}
+                      defaultValue
+                    >
                       Chọn quận huyện
                     </option>
-                    {Province.code &&
+                    {address &&
+                      Province.code &&
                       dataDistrict.map((item) => {
                         if (item.province_code === Province.code)
                           return (
@@ -271,6 +327,7 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
                                 code: item.code,
                                 name: item.name,
                               })}
+                              selected={item.name === address.district}
                             >
                               {item.name}
                             </option>
@@ -295,10 +352,17 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
                       setWard(Ward);
                     }}
                   >
-                    <option value="" defaultValue>
+                    <option
+                      value={JSON.stringify({
+                        code: null,
+                        name: null,
+                      })}
+                      defaultValue
+                    >
                       Chọn phường xã
                     </option>
-                    {District.code &&
+                    {address &&
+                      District.code &&
                       dataWards.map((item) => {
                         if (item.district_code === District.code)
                           return (
@@ -308,6 +372,7 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
                                 code: item.code,
                                 name: item.name,
                               })}
+                              selected={item.name === address.ward}
                             >
                               {item.name}
                             </option>
@@ -338,10 +403,10 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
           </div>
         </Modal.Body>
         <Modal.Footer className="flex justify-end">
-          <Button onClick={handleAddAddress}>Thêm</Button>
+          <Button onClick={handleEditAddress}>Sửa</Button>
         </Modal.Footer>
       </Modal>
     </>
   );
 });
-export default FormAddAddress;
+export default FormEditAddress;
