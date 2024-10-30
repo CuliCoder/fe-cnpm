@@ -14,6 +14,7 @@ import {
   changeQuantity,
   removeFromCart,
 } from "../../Slice/cartSlice";
+import { setDiscountCode, clearDiscountCode } from "../../Slice/discountSlice";
 import { formatPrice } from "../../config/formatPrice";
 import { setShowToast } from "../../Slice/MyToastSlice";
 import axios from "../../config/configAxios";
@@ -22,12 +23,13 @@ export default function Cart() {
   const itemsOfCart = useSelector((state) => state.cart.getCart.items);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [currentDiscount, setCurrentDiscount] = useState(0);
+  const [inputDiscount, setInputDiscount] = useState("");
 
   const [status_login, setStatus_login] = useState(false);
   const status = useSelector((state) => state.status);
-  const [discount, setDiscount] = useState("");
 
   const products = useSelector((state) => state.products.products_page);
+  const discount = useSelector((state) => state.discount);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const increaseItem = (item) => {
@@ -83,14 +85,16 @@ export default function Cart() {
 
   const checkDiscountValid = async () => {
     if (discount == "") {
-      setShowToast({
-        show: true,
-        type: "warning",
-        message: "Vui lòng nhập mã giảm giá",
-      });
+      dispatch(
+        setShowToast({
+          show: true,
+          type: "warning",
+          message: "Vui lòng nhập mã giảm giá",
+        })
+      );
     } else {
       let res = await axios.post(`/api/user/check-coupon`, {
-        coupon: discount.trim(),
+        coupon: inputDiscount.trim(),
         value_apply: currentPrice,
       });
 
@@ -101,9 +105,25 @@ export default function Cart() {
           );
           const discountAmount = (currentPrice * discountValue) / 100;
           setCurrentDiscount(discountAmount);
-          console.log(currentDiscount);
+          dispatch(
+            setShowToast({
+              show: true,
+              type: "success",
+              message: "Áp dụng mã giảm giá thành công",
+            })
+          );
+          dispatch(
+            setDiscountCode({ code: inputDiscount, negative: discountAmount })
+          );
         } else {
-          console.log(res.data);
+          dispatch(
+            setShowToast({
+              show: true,
+              type: "error",
+              message: res.data.message,
+            })
+          );
+          dispatch(clearDiscountCode());
         }
       }
     }
@@ -184,7 +204,7 @@ export default function Cart() {
                 name=""
                 id=""
                 placeholder="Nhập mã giảm giá"
-                onChange={(e) => setDiscount(e.target.value)}
+                onChange={(e) => setInputDiscount(e.target.value)}
                 className="border-none outline-none w-[300px] px-2"
               />
               <button

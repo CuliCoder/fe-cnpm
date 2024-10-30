@@ -9,8 +9,10 @@ import userReducer from "./Slice/userSlice.js";
 import addressReducer from "./Slice/addressSlice.js";
 import MyToast from "./Slice/MyToastSlice.js";
 import author from "./Slice/authorSlice.js";
+import discountSlice from "./Slice/discountSlice.js";
 export default configureStore({
   reducer: {
+    discount: discountSlice,
     cart: cartReducer,
     products: productReducer,
     login: loginReducer,
@@ -20,6 +22,6 @@ export default configureStore({
     user: userReducer,
     address: addressReducer,
     toast: MyToast,
-    author: author
+    author: author,
   },
 });
