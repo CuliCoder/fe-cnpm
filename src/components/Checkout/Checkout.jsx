@@ -10,7 +10,6 @@ import "./Checkout.css";
 import axiosConfig from "../../config/configAxios.js";
 import { formatPrice } from "../../config/formatPrice.js";
 import { setShowToast } from "../../Slice/MyToastSlice";
-import { clearDiscountCode } from "../../Slice/discountSlice";
 
 const Checkout = React.memo(() => {
   const [firstName, setFirstName] = useState("");
@@ -41,7 +40,6 @@ const Checkout = React.memo(() => {
 
   const productInCart = useSelector((state) => state.cart.getCart.items);
   const discount = useSelector((state) => state.discount.discount);
-  console.log(discount);
 
   useEffect(() => {
     axios
@@ -81,6 +79,34 @@ const Checkout = React.memo(() => {
 
   const handleAcceptOrder = () => {
     async function sendOrder() {
+      if (
+        firstName === "" ||
+        lastName === "" ||
+        phoneNumber === "" ||
+        email === "" ||
+        idProvince === null ||
+        idDistrict === null ||
+        idWard === null ||
+        detailAddress === ""
+      ) {
+        dispatch(
+          setShowToast({
+            show: true,
+            type: "warning",
+            message: "Vui lòng nhập đầy đủ thông tin",
+          })
+        );
+        return;
+      } else if (productInCart.length === 0) {
+        dispatch(
+          setShowToast({
+            show: true,
+            type: "warning",
+            message: "Giỏ hàng của bạn đang trống",
+          })
+        );
+        return;
+      }
       const res = await axiosConfig.post(
         "/api/user/add_order",
         JSON.stringify({

@@ -382,14 +382,18 @@ const MyAccount = React.memo(() => {
                                   key={product.id}
                                 >
                                   <p className="font-bold">{product.name}</p>
-                                  <p>Đơn giá: {product.unitPrice}</p>
+                                  <p>
+                                    Đơn giá: {formatPrice(product.unitPrice)}
+                                  </p>
                                   <p>x{product.quantity}</p>
                                   <p>
-                                    {(() => {
-                                      return (
-                                        product.unitPrice * product.quantity
-                                      );
-                                    })()}
+                                    {formatPrice(
+                                      (() => {
+                                        return (
+                                          product.unitPrice * product.quantity
+                                        );
+                                      })()
+                                    )}
                                   </p>
                                 </div>
                               ))}
