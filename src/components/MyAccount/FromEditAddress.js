@@ -4,7 +4,7 @@ import { Button } from "flowbite-react";
 import { rgAddress, rgName, rgPhone, rgEmail } from "../../utils/regex";
 import MyToast from "../MyToast/MyToast";
 import { Modal } from "flowbite-react";
-import { fetchEditAddress ,clearEditAddress } from "../../Slice/userSlice";
+import { fetchEditAddress, clearEditAddress } from "../../Slice/userSlice";
 const FormEditAddress = React.memo(({ show, onClose, address }) => {
   const [showToast, setShowToast] = React.useState({
     show: false,
@@ -32,10 +32,9 @@ const FormEditAddress = React.memo(({ show, onClose, address }) => {
   const dataProvince = useSelector((state) => state.address.provinces);
   const dataDistrict = useSelector((state) => state.address.districts);
   const dataWards = useSelector((state) => state.address.wards);
-  const addAddress = useSelector((state) => state.user.addAddress);
+  const editAddress = useSelector((state) => state.user.editAddress);
   const userAddress = useSelector((state) => state.user.address);
   const [isChange, setIsChange] = React.useState(false);
-  const userEditAddress = useSelector((state) => state.user.editAddress);
   React.useEffect(() => {
     if (userAddress.list.length > 0 && address) {
       if (address) {
@@ -80,15 +79,16 @@ const FormEditAddress = React.memo(({ show, onClose, address }) => {
     }
   }, [showToast]);
   React.useEffect(() => {
-    if (addAddress.error === 1) {
+    if (editAddress.error === 1) {
       setShowToast({
         show: true,
         type: "error",
-        message: addAddress.message,
+        message: editAddress.message,
       });
       dispatch(clearEditAddress());
+      return;
     }
-  }, [addAddress.error]);
+  }, [editAddress.error]);
   React.useEffect(() => {
     if (Province.code && isChange) {
       setDistrict({
@@ -151,6 +151,7 @@ const FormEditAddress = React.memo(({ show, onClose, address }) => {
     }
     dispatch(
       fetchEditAddress({
+        id_address: address.id,
         phone_number: phoneNumber,
         email,
         firstName,

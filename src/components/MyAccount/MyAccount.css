@@ -12,7 +12,10 @@
   max-width: 500px;
   min-width: 500px;
 }
-
+.radio-address>div{
+  max-width: 400px;
+  min-width: 400px;
+}
 .container-rdo-address {
   display: flex;
   flex-direction: row;

@@ -116,6 +116,7 @@ export const fetchEditAddress = createAsyncThunk(
   "user/fetchEditAddress",
   async (
     {
+      id_address,
       phone_number,
       email,
       firstName,
@@ -129,6 +130,7 @@ export const fetchEditAddress = createAsyncThunk(
   ) => {
     try {
       const response = await axios.put("/api/user/address/edit", {
+        id_address,
         phone_number,
         email,
         firstName,
@@ -284,17 +286,17 @@ const userSlice = createSlice({
         state.selectAddress.loading = false;
       })
       .addCase(fetchEditAddress.pending, (state) => {
-        state.selectAddress.loading = true;
+        state.editAddress.loading = true;
       })
       .addCase(fetchEditAddress.fulfilled, (state, action) => {
-        state.selectAddress.error = action.payload.error;
-        state.selectAddress.message = action.payload.message;
-        state.selectAddress.loading = false;
+        state.editAddress.error = action.payload.error;
+        state.editAddress.message = action.payload.message;
+        state.editAddress.loading = false;
       })
       .addCase(fetchEditAddress.rejected, (state, action) => {
-        state.selectAddress.error = action.payload.error;
-        state.selectAddress.message = action.payload.message;
-        state.selectAddress.loading = false;
+        state.editAddress.error = action.payload.error;
+        state.editAddress.message = action.payload.message;
+        state.editAddress.loading = false;
       });
   },
 });

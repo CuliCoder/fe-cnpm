@@ -43,7 +43,7 @@ const RadioAddress = React.memo(
                     </div>
                     <div className="address">
                       <span className="font-bold">Địa chỉ: </span>
-                      <span>{`${item.detail} ${item.ward} ${item.district} ${item.province}`}</span>
+                      <span>{`${item.detail}, ${item.ward}, ${item.district}, ${item.province}`}</span>
                     </div>
                   </div>
                   <input

@@ -209,7 +209,7 @@ const MyAccount = React.memo(() => {
       dispatch(clearEditAddress());
       dispatch(fetchAddressWithId());
     }
-  }, [addAddress.error]);
+  }, [usereditAddress.error]);
   useEffect(() => {
     if (selectAddress.error !== null) {
       dispatch(
@@ -520,8 +520,8 @@ const MyAccount = React.memo(() => {
             )}
             <FormAddAddress show={addressForm} onClose={setAddressForm} />
             <FormEditAddress
-              show={editAddress}
-              onClose={openEditAddressForm}
+              show={openEditAddressForm}
+              onClose={setOpenEditAddressForm}
               address={editAddress}
             />
             {infoAccount && (
