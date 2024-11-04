@@ -53,8 +53,29 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
         message: addAddress.message,
       });
       dispatch(clearAddAddress());
+      return;
     }
+    clearState();
   }, [addAddress.error]);
+  const clearState = () => {
+    setLastName("");
+    setFirstName("");
+    setPhoneNumber("");
+    setEmail("");
+    setProvince({
+      code: null,
+      name: null,
+    });
+    setDistrict({
+      code: null,
+      name: null,
+    });
+    setWard({
+      code: null,
+      name: null,
+    });
+    setdetailAddress("");
+  };
   React.useEffect(() => {
     if (Province.code) {
       setDistrict({
@@ -127,7 +148,13 @@ const FormAddAddress = React.memo(({ show, onClose }) => {
   };
   return (
     <>
-      <Modal show={show} onClose={() => onClose(false)}>
+      <Modal
+        show={show}
+        onClose={() => {
+          onClose(false);
+          clearState();
+        }}
+      >
         {showToast.show && (
           <MyToast type={showToast.type} message={showToast.message} />
         )}

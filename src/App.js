@@ -39,6 +39,7 @@ function App() {
   const userAddress = useSelector((state) => state.user.address);
   const userAddAddress = useSelector((state) => state.user.addAddress);
   const userSelectAddress = useSelector((state) => state.user.selectAddress);
+  const userDeleteAddress = useSelector((state) => state.user.deleteAddress);
   useEffect(() => {
     dispatch(check_status());
     dispatch(fetchAllProducts());
@@ -64,6 +65,7 @@ function App() {
         userAddress.loading ||
         userAddAddress.loading ||
         userSelectAddress.loading ||
+        userDeleteAddress.loading ||
         addCart.loading) && <Spinner />}
       <Routes>
         <Route

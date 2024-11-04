@@ -1,6 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchDeleteAddress } from "../../Slice/userSlice";
 const RadioAddress = React.memo(
   ({ listAddress, selectAddress, editAddress }) => {
+    const dispatch = useDispatch();
     const handleClick = (event, id) => {
       event.stopPropagation();
       selectAddress(id);
@@ -12,6 +15,11 @@ const RadioAddress = React.memo(
     //     selectAddress(address.id);
     //   }
     // }, [listAddress]);
+    const deleteAddress = (id) => {
+      const opt = window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?");
+      if (!opt) return;
+      dispatch(fetchDeleteAddress(id));
+    };
     return (
       <div className="container-address">
         {listAddress.length <= 0 ? (
@@ -62,11 +70,16 @@ const RadioAddress = React.memo(
                 <div className="rdo-address-btn">
                   <button
                     className="btn-edit text-[#fd6d4f]"
-                    onClick={() => editAddress(true,item)}
+                    onClick={() => editAddress(true, item)}
                   >
                     Sửa
                   </button>
-                  <button className="btn-delete text-[#fd6d4f]">Xóa</button>
+                  <button
+                    className="btn-delete text-[#fd6d4f]"
+                    onClick={() => deleteAddress(item.id)}
+                  >
+                    Xóa
+                  </button>
                 </div>
               </div>
             );

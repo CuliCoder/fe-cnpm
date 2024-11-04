@@ -146,6 +146,19 @@ export const fetchEditAddress = createAsyncThunk(
     }
   }
 );
+export const fetchDeleteAddress = createAsyncThunk(
+  "user/fetchDeleteAddress",
+  async (id_address, { _, rejectWithValue }) => {
+    try {
+      const response = await axios.delete(
+        `/api/user/address/delete/${id_address}`
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -185,6 +198,11 @@ const userSlice = createSlice({
       error: null,
       message: null,
     },
+    deleteAddress: {
+      loading: false,
+      error: null,
+      message: null,
+    },
   },
   reducers: {
     clearChagneInfo: (state) => {
@@ -202,6 +220,10 @@ const userSlice = createSlice({
     clearEditAddress: (state) => {
       state.editAddress.error = null;
       state.editAddress.message = null;
+    },
+    clearDeleteAddress: (state) => {
+      state.deleteAddress.error = null;
+      state.deleteAddress.message = null;
     },
   },
   extraReducers: (builder) => {
@@ -253,7 +275,7 @@ const userSlice = createSlice({
         state.address.loading = true;
       })
       .addCase(fetchAddressWithId.fulfilled, (state, action) => {
-        if (action.payload.length > 0) state.address.list = action.payload;
+        state.address.list = action.payload;
         state.address.loading = false;
       })
       .addCase(fetchAddressWithId.rejected, (state) => {
@@ -297,6 +319,19 @@ const userSlice = createSlice({
         state.editAddress.error = action.payload.error;
         state.editAddress.message = action.payload.message;
         state.editAddress.loading = false;
+      })
+      .addCase(fetchDeleteAddress.pending, (state) => {
+        state.deleteAddress.loading = true;
+      })
+      .addCase(fetchDeleteAddress.fulfilled, (state, action) => {
+        state.deleteAddress.error = action.payload.error;
+        state.deleteAddress.message = action.payload.message;
+        state.deleteAddress.loading = false;
+      })
+      .addCase(fetchDeleteAddress.rejected, (state, action) => {
+        state.deleteAddress.error = action.payload.error;
+        state.deleteAddress.message = action.payload.message;
+        state.deleteAddress.loading = false;
       });
   },
 });
@@ -306,4 +341,5 @@ export const {
   clearAddAddress,
   clearSelectAddress,
   clearEditAddress,
+  clearDeleteAddress,
 } = userSlice.actions;

@@ -21,6 +21,7 @@ import {
   clearSelectAddress,
   clearAddAddress,
   clearEditAddress,
+  clearDeleteAddress,
 } from "../../Slice/userSlice";
 import { fetchAddressWithId } from "../../Slice/userSlice";
 import { formatPrice } from "../../config/formatPrice";
@@ -58,6 +59,7 @@ const MyAccount = React.memo(() => {
   const selectAddress = useSelector((state) => state.user.selectAddress);
   const addAddress = useSelector((state) => state.user.addAddress);
   const usereditAddress = useSelector((state) => state.user.editAddress);
+  const userdeleteAddress = useSelector((state) => state.user.deleteAddress);
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -223,6 +225,19 @@ const MyAccount = React.memo(() => {
       dispatch(fetchAddressWithId());
     }
   }, [selectAddress.error]);
+  useEffect(() => {
+    if (userdeleteAddress.error !== null) {
+      dispatch(
+        setShowToast({
+          show: true,
+          message: userdeleteAddress.message,
+          type: userdeleteAddress.error === 0 ? "success" : "error",
+        })
+      );
+      dispatch(clearDeleteAddress());
+      dispatch(fetchAddressWithId());
+    }
+  }, [userdeleteAddress.error]);
   const handleSelectAddress = useCallback((id) => {
     dispatch(fetchSelectAddress(id));
   }, []);
