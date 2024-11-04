@@ -9,6 +9,8 @@ import { FaCartPlus } from "react-icons/fa";
 import "./Checkout.css";
 import axiosConfig from "../../config/configAxios.js";
 import { formatPrice } from "../../config/formatPrice.js";
+import { setShowToast } from "../../Slice/MyToastSlice";
+
 const Checkout = React.memo(() => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -29,11 +31,15 @@ const Checkout = React.memo(() => {
   const [currentPrice, setCurrentPrice] = useState(0);
   const [isLoad, setLoad] = useState(false);
   const [isToast, setToast] = useState(false);
+  const [currentDiscount, setCurrentDiscount] = useState(0);
+  const [inputDiscount, setInputDiscount] = useState("");
+
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
   const productInCart = useSelector((state) => state.cart.getCart.items);
+  const discount = useSelector((state) => state.discount.discount);
 
   useEffect(() => {
     axios
@@ -73,6 +79,34 @@ const Checkout = React.memo(() => {
 
   const handleAcceptOrder = () => {
     async function sendOrder() {
+      if (
+        firstName === "" ||
+        lastName === "" ||
+        phoneNumber === "" ||
+        email === "" ||
+        idProvince === null ||
+        idDistrict === null ||
+        idWard === null ||
+        detailAddress === ""
+      ) {
+        dispatch(
+          setShowToast({
+            show: true,
+            type: "warning",
+            message: "Vui lòng nhập đầy đủ thông tin",
+          })
+        );
+        return;
+      } else if (productInCart.length === 0) {
+        dispatch(
+          setShowToast({
+            show: true,
+            type: "warning",
+            message: "Giỏ hàng của bạn đang trống",
+          })
+        );
+        return;
+      }
       const res = await axiosConfig.post(
         "/api/user/add_order",
         JSON.stringify({
@@ -83,6 +117,7 @@ const Checkout = React.memo(() => {
           address: `${detailAddress}, ${dataWardName}, ${dataDistrictName}, ${dataProvinceName}`,
           products: productInCart,
           note: note,
+          discount: discount.negative,
           shipFee: shipFee,
           total: currentPrice,
         })
@@ -117,6 +152,48 @@ const Checkout = React.memo(() => {
     });
     setCurrentPrice(total);
   }, [productInCart]);
+
+  const checkDiscountValid = async () => {
+    if (discount == "") {
+      dispatch(
+        setShowToast({
+          show: true,
+          type: "warning",
+          message: "Vui lòng nhập mã giảm giá",
+        })
+      );
+    } else {
+      let res = await axios.post(`/api/user/check-coupon`, {
+        coupon: inputDiscount.trim(),
+        value_apply: currentPrice,
+      });
+
+      if (res.status === 200) {
+        if (res.data[0]?.discount_value) {
+          const discountValue = parseFloat(
+            res.data[0].discount_value.replace("%", "")
+          );
+          const discountAmount = (currentPrice * discountValue) / 100;
+          setCurrentDiscount(discountAmount);
+          dispatch(
+            setShowToast({
+              show: true,
+              type: "success",
+              message: "Áp dụng mã giảm giá thành công",
+            })
+          );
+        } else {
+          dispatch(
+            setShowToast({
+              show: true,
+              type: "error",
+              message: res.data.message,
+            })
+          );
+        }
+      }
+    }
+  };
 
   return (
     <div>
@@ -375,11 +452,41 @@ const Checkout = React.memo(() => {
                   </div>
                 ))}
               </div>
+              {discount?.code == "" && (
+                <div className="coupons border-gray-700 border-solid border p-1 rounded-sm w-[430px]">
+                  <input
+                    type="text"
+                    name=""
+                    id=""
+                    placeholder="Nhập mã giảm giá"
+                    onChange={(e) => setInputDiscount(e.target.value)}
+                    className="border-none outline-none w-[300px] px-2"
+                  />
+                  <button
+                    type="button"
+                    className="h-full w-28 bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200"
+                    onClick={checkDiscountValid}
+                  >
+                    Apply
+                  </button>
+                </div>
+              )}
               <div className="mt-[20px] bg-[#ebebeb] p-5">
                 <p className="font-bold text-xl">Giá trị đơn hàng</p>
                 <div className="flex justify-between items-center">
                   <p className="font-base text-slate-500">Giá sản phẩm</p>
                   <span className="font-bold">{formatPrice(currentPrice)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="font-base text-slate-500">Được giảm</p>
+                  <span className="font-bold">
+                    -{" "}
+                    {formatPrice(
+                      discount.negative > 0
+                        ? discount.negative
+                        : currentDiscount
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="font-base text-slate-500">Giao hàng</p>
@@ -390,7 +497,7 @@ const Checkout = React.memo(() => {
                 <div className="flex justify-between items-center">
                   <p className="font-base text-slate-500">Tổng</p>
                   <span className="font-bold">
-                    {formatPrice(currentPrice + shipFee)}
+                    {formatPrice(currentPrice + shipFee - currentDiscount)}
                   </span>
                 </div>
               </div>
