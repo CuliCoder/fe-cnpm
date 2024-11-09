@@ -36,7 +36,13 @@ const FormEditAddress = React.memo(({ show, onClose, address }) => {
   const userAddress = useSelector((state) => state.user.address);
   const [isChange, setIsChange] = React.useState(false);
   React.useEffect(() => {
-    if (userAddress.list.length > 0 && address) {
+    if (
+      userAddress.list.length > 0 &&
+      dataDistrict.length > 0 &&
+      dataProvince.length > 0 &&
+      dataWards.length > 0 &&
+      address
+    ) {
       if (address) {
         setLastName(address.lastName);
         setFirstName(address.firstName);
@@ -114,7 +120,6 @@ const FormEditAddress = React.memo(({ show, onClose, address }) => {
       !firstName ||
       !phoneNumber ||
       !email ||
-      !detailAddress ||
       !detailAddress ||
       !Province.code ||
       !District.code ||

@@ -1,150 +1,178 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Spinner, Toast } from "flowbite-react";
-import { HiCheck } from "react-icons/hi";
 import { useSelector, useDispatch } from "react-redux";
-import { clearCart } from "../../Slice/cartSlice";
 import { FaCartPlus } from "react-icons/fa";
 import "./Checkout.css";
-import axiosConfig from "../../config/configAxios.js";
 import { formatPrice } from "../../config/formatPrice.js";
 import { setShowToast } from "../../Slice/MyToastSlice";
-
+import { fetchAddOrder,clearAddOrder } from "../../Slice/userSlice";
+import { rgAddress, rgName, rgPhone, rgEmail } from "../../utils/regex";
+import Spinner from "../Spinner/Spinner.js";
 const Checkout = React.memo(() => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
-  const [idProvince, setIdProvince] = useState(null);
-  const [idDistrict, setIdDistrict] = useState(null);
-  const [idWard, setIdWard] = useState(null);
-  const [dataProvince, setdataProvince] = useState([]);
-  const [dataDistrict, setdataDistrict] = useState([]);
-  const [dataWardName, setdataWardName] = useState("");
-  const [dataProvinceName, setdataProvinceName] = useState("");
-  const [dataDistrictName, setdataDistrictName] = useState("");
-  const [dataWards, setdataWards] = useState([]);
+  const [Province, setProvince] = useState({
+    code: null,
+    name: null,
+  });
+  const [District, setDistrict] = useState({
+    code: null,
+    name: null,
+  });
+  const [Ward, setWard] = useState({
+    code: null,
+    name: null,
+  });
   const [detailAddress, setdetailAddress] = useState("");
   const [shipFee, setShipFee] = useState(0);
   const [currentPrice, setCurrentPrice] = useState(0);
-  const [isLoad, setLoad] = useState(false);
+  const [isLoad, setLoad] = useState(true);
   const [isToast, setToast] = useState(false);
   const [currentDiscount, setCurrentDiscount] = useState(0);
   const [inputDiscount, setInputDiscount] = useState("");
-
+  const userAddress = useSelector((state) => state.user.address);
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
-
   const productInCart = useSelector((state) => state.cart.getCart.items);
   const discount = useSelector((state) => state.discount.discount);
+  const dataProvince = useSelector((state) => state.address.provinces);
+  const dataDistrict = useSelector((state) => state.address.districts);
+  const dataWards = useSelector((state) => state.address.wards);
+  const [isChange, setIsChange] = useState(false);
+  const userAddOrder = useSelector((state) => state.user.addOrder);
 
   useEffect(() => {
-    axios
-      .get("https://esgoo.net/api-tinhthanh/1/0.htm")
-      .then((response) => {
-        setdataProvince(response.data.data);
-      })
-      .catch((error) => {
-        console.error(error);
+    if (
+      userAddress.list.length > 0 &&
+      dataDistrict.length > 0 &&
+      dataProvince.length > 0 &&
+      dataWards.length > 0
+    ) {
+      userAddress.list[0].addressList.forEach((address) => {
+        if (address.default === "1") {
+          setFirstName(address.firstName);
+          setLastName(address.lastName);
+          setPhoneNumber(address.phoneNumber);
+          setEmail(address.email);
+          const province = dataProvince.find((item) => {
+            return item.name === address.province;
+          });
+          setProvince({
+            code: province.code,
+            name: province.name,
+          });
+          const district = dataDistrict.find((item) => {
+            return item.name === address.district;
+          });
+          setDistrict({
+            code: district.code,
+            name: district.name,
+          });
+          const ward = dataWards.find((item) => {
+            return item.name === address.ward;
+          });
+          setWard({
+            code: ward.code,
+            name: ward.name,
+          });
+          setdetailAddress(address.detail);
+          setLoad(false);
+          return;
+        }
+       
       });
-  }, []);
-
+    }
+  }, [userAddress.list, dataDistrict, dataProvince, dataWards]);
   useEffect(() => {
-    axios
-      .get(` https://esgoo.net/api-tinhthanh/2/${idProvince}.htm`)
-      .then((res) => {
-        setdataDistrict(res.data.data);
-        setdataProvinceName(res.data.data_name);
-      })
-      .catch((err) => {
-        console.error(err);
+    if (Province.code && isChange) {
+      setDistrict({
+        code: null,
+        name: null,
       });
-  }, [idProvince]);
-
+    }
+  }, [Province.code]);
   useEffect(() => {
-    axios
-      .get(`https://esgoo.net/api-tinhthanh/3/${idDistrict}.htm`)
-      .then((res) => {
-        setdataWards(res.data.data);
-        setdataDistrictName(res.data.data_name);
-        setShipFee(idProvince === "79" ? 19000 : 35000);
-      })
-      .catch((err) => {
-        console.error(err);
+    if (District.code && isChange) {
+      setWard({
+        code: null,
+        name: null,
       });
-  }, [idDistrict]);
-
+    }
+  }, [District.code]);
+  const checkValid = () => {
+    if (
+      !lastName ||
+      !firstName ||
+      !phoneNumber ||
+      !email ||
+      !detailAddress ||
+      !Province.code ||
+      !District.code ||
+      !Ward.code
+    ) {
+      return "Vui lòng điền đầy đủ thông tin";
+    }
+    if (!rgName.test(lastName)) {
+      return "Tên không hợp lệ";
+    }
+    if (!rgName.test(firstName)) {
+      return "Họ không hợp lệ";
+    }
+    if (!rgPhone.test(phoneNumber)) {
+      return "Số điện thoại không hợp lệ";
+    }
+    if (!rgEmail.test(email)) {
+      return "Email không hợp lệ";
+    }
+    if (!rgAddress.test(detailAddress)) {
+      return "Địa chỉ không hợp lệ";
+    }
+    return null;
+  };
   const handleAcceptOrder = () => {
-    async function sendOrder() {
-      if (
-        firstName === "" ||
-        lastName === "" ||
-        phoneNumber === "" ||
-        email === "" ||
-        idProvince === null ||
-        idDistrict === null ||
-        idWard === null ||
-        detailAddress === ""
-      ) {
-        dispatch(
-          setShowToast({
-            show: true,
-            type: "warning",
-            message: "Vui lòng nhập đầy đủ thông tin",
-          })
-        );
-        return;
-      } else if (productInCart.length === 0) {
-        dispatch(
-          setShowToast({
-            show: true,
-            type: "warning",
-            message: "Giỏ hàng của bạn đang trống",
-          })
-        );
-        return;
-      }
-      const res = await axiosConfig.post(
-        "/api/user/add_order",
-        JSON.stringify({
-          employeeId: null,
-          fullname: `${firstName} ${lastName}`,
-          phoneNumber: phoneNumber,
-          email: email,
-          address: `${detailAddress}, ${dataWardName}, ${dataDistrictName}, ${dataProvinceName}`,
-          products: productInCart,
-          note: note,
-          discount: discount.negative,
-          shipFee: shipFee,
-          total: currentPrice,
+    const check = checkValid();
+    if (check) {
+      dispatch(
+        setShowToast({
+          show: true,
+          type: "error",
+          message: check,
         })
       );
-      if (res.data.status) {
-        setLoad(true);
-        setTimeout(() => {
-          setToast(true);
-        }, 1000);
-        setTimeout(() => {
-          navigate("/");
-          setLoad(false);
-        }, 1500);
-        dispatch(clearCart());
-      } else {
-        console.log(res.data.message);
-      }
+      return;
     }
-    sendOrder();
+    dispatch(
+      fetchAddOrder({
+        employeeId: null,
+        fullname: `${firstName} ${lastName}`,
+        phoneNumber: phoneNumber,
+        email: email,
+        address: `${detailAddress}, ${Ward.name}, ${District.name}, ${Province.name}`,
+        products: productInCart,
+        note: note,
+        discount: discount.negative,
+        shipFee: shipFee,
+        total: currentPrice,
+      })
+    );
   };
-
   useEffect(() => {
-    const result = dataWards.find((item) => item.id === idWard);
-
-    setdataWardName(result ? result.name : undefined);
-  }, [idWard]);
-
+    if (userAddOrder.error !== null) {
+      dispatch(
+        setShowToast({
+          show: true,
+          type: userAddOrder.error === 1 ? "error" : "success",
+          message: userAddOrder.message,
+        })
+      );
+      dispatch(clearAddOrder());  
+      userAddOrder.error === 0 && navigate("/");
+    }
+  }, [userAddOrder.error]);
   useEffect(() => {
     let total = 0;
     productInCart.forEach((item) => {
@@ -197,6 +225,7 @@ const Checkout = React.memo(() => {
 
   return (
     <div>
+      {isLoad && <Spinner />}
       <div className="breadcrumb bg-[#f4f9fc] h-[110px] py-5 ">
         <div className="flex items-center justify-center">
           <Link to="/" className="px-1">
@@ -211,17 +240,6 @@ const Checkout = React.memo(() => {
         <div className="text-3xl font-bold text-center">Thanh toán</div>
       </div>
       <div className="w-[1170px] m-auto relative">
-        {isToast && (
-          <Toast className="fixed top-[150px] right-10">
-            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
-              <HiCheck className="h-5 w-5" />
-            </div>
-            <div className="ml-3 text-sm font-normal">
-              Đơn hàng đã được đăt thành công
-            </div>
-            <Toast.Toggle />
-          </Toast>
-        )}
         <div className="checkout">
           <div></div>
           <div className="grid grid-cols-2 gap-x-[30px] mt-20">
@@ -318,18 +336,35 @@ const Checkout = React.memo(() => {
                     <select
                       id="city"
                       onChange={(e) => {
-                        setIdProvince(e.target.value);
+                        const Province = JSON.parse(e.target.value);
+                        setProvince(Province);
+                        setIsChange(true);
                       }}
                       className="block h-[40px] border-slate-200 focus:ring-0 w-[230px] mt-1"
                     >
-                      <option value="" defaultValue>
+                      <option
+                        value={JSON.stringify({
+                          code: null,
+                          name: null,
+                        })}
+                        defaultValue
+                      >
                         Chọn tỉnh thành
                       </option>
-                      {dataProvince.map((item, index) => (
-                        <option key={index} value={item.id}>
-                          {item.full_name}
-                        </option>
-                      ))}
+                      {dataProvince.map((item) => {
+                        return (
+                          <option
+                            key={item.code}
+                            value={JSON.stringify({
+                              code: item.code,
+                              name: item.name,
+                            })}
+                            selected={item.code === Province.code}
+                          >
+                            {item.name}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 
@@ -341,18 +376,36 @@ const Checkout = React.memo(() => {
                     <select
                       id="district"
                       onChange={(e) => {
-                        setIdDistrict(e.target.value);
+                        const District = JSON.parse(e.target.value);
+                        setDistrict(District);
+                        setIsChange(true);
                       }}
                       className="block h-[40px] border-slate-200 focus:ring-0 w-[230px] mt-1"
                     >
-                      <option value="" defaultValue>
+                      <option
+                        value={JSON.stringify({
+                          code: null,
+                          name: null,
+                        })}
+                        defaultValue
+                      >
                         Chọn quận huyện
                       </option>
-                      {dataDistrict.map((item, index) => (
-                        <option key={index} value={item.id}>
-                          {item.full_name}
-                        </option>
-                      ))}
+                      {dataDistrict.map((item) => {
+                        if (item.province_code === Province.code)
+                          return (
+                            <option
+                              key={item.code}
+                              value={JSON.stringify({
+                                code: item.code,
+                                name: item.name,
+                              })}
+                              selected={item.code === District.code}
+                            >
+                              {item.name}
+                            </option>
+                          );
+                      })}
                     </select>
                   </div>
                 </div>
@@ -368,17 +421,34 @@ const Checkout = React.memo(() => {
                       id="ward"
                       className="block h-[40px] border-slate-200 focus:ring-0 w-[230px] mt-1"
                       onChange={(e) => {
-                        setIdWard(e.target.value);
+                        const Ward = JSON.parse(e.target.value);
+                        setWard(Ward);
                       }}
                     >
-                      <option value="" defaultValue>
+                      <option
+                        value={JSON.stringify({
+                          code: null,
+                          name: null,
+                        })}
+                        defaultValue
+                      >
                         Chọn phường xã
                       </option>
-                      {dataWards.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.full_name}
-                        </option>
-                      ))}
+                      {dataWards.map((item) => {
+                        if (item.district_code === District.code)
+                          return (
+                            <option
+                              key={item.code}
+                              value={JSON.stringify({
+                                code: item.code,
+                                name: item.name,
+                              })}
+                              selected={item.code === Ward.code}
+                            >
+                              {item.name}
+                            </option>
+                          );
+                      })}
                     </select>
                   </div>
                   <div>
@@ -516,13 +586,6 @@ const Checkout = React.memo(() => {
             </button>
           </div>
         </div>
-        {isLoad && (
-          <div className=" flex justify-center items-center absolute top-[50%] left-[42%] w-[200px] h-[200px] bg-[rgba(0,0,0,0.2)]">
-            <div className=" flex-wrap  gap-2 ">
-              <Spinner aria-label="Extra large spinner example" size="xl" />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

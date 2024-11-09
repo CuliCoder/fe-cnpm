@@ -28,6 +28,7 @@ import {
   fetchDistricts,
   fetchWards,
 } from "./Slice/addressSlice.js";
+import { fetchAddressWithId } from "./Slice/userSlice.js";
 function App() {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.status);
@@ -40,6 +41,9 @@ function App() {
   const userAddAddress = useSelector((state) => state.user.addAddress);
   const userSelectAddress = useSelector((state) => state.user.selectAddress);
   const userDeleteAddress = useSelector((state) => state.user.deleteAddress);
+  const userAddOrder = useSelector((state) => state.user.addOrder);
+  const userCancelOrder = useSelector((state) => state.user.cancelOrder);
+  const userEditAddress = useSelector((state) => state.user.editAddress);
   useEffect(() => {
     dispatch(check_status());
     dispatch(fetchAllProducts());
@@ -48,6 +52,7 @@ function App() {
     dispatch(fetchProvinces());
     dispatch(fetchDistricts());
     dispatch(fetchWards());
+    dispatch(fetchAddressWithId());
   }, []);
   useEffect(() => {
     if (status.error === 0) {
@@ -66,6 +71,9 @@ function App() {
         userAddAddress.loading ||
         userSelectAddress.loading ||
         userDeleteAddress.loading ||
+        userAddOrder.loading ||
+        userCancelOrder.loading ||
+        userEditAddress.loading ||
         addCart.loading) && <Spinner />}
       <Routes>
         <Route

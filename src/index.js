@@ -6,10 +6,13 @@ import reportWebVitals from "./reportWebVitals";
 import "./Fonts/Montserrat/Montserrat-VariableFont_wght.ttf";
 import { Provider } from "react-redux";
 import store from "./store.js";
+import { ContextProvider } from "./Context/ContextAPI";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
-    <App />
+    <ContextProvider>
+      <App />
+    </ContextProvider>
   </Provider>
 );
 

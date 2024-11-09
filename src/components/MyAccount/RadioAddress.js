@@ -1,23 +1,17 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchDeleteAddress } from "../../Slice/userSlice";
+import { useMyContext } from "../../Context/ContextAPI";
 const RadioAddress = React.memo(
   ({ listAddress, selectAddress, editAddress }) => {
+  const { setOpenConfirmModal ,handleClick } = useMyContext();
     const dispatch = useDispatch();
-    const handleClick = (event, id) => {
-      event.stopPropagation();
-      selectAddress(id);
-    };
-    // useEffect(() => {
-    //   if (listAddress.length > 0 && listAddress[0].addressList.length === 1) {
-    //     const address = listAddress[0].addressList[0];
-    //     if (address.default === "1") return;
-    //     selectAddress(address.id);
-    //   }
-    // }, [listAddress]);
+    const handleClickModal =(opt) =>{
+      handleClick(()=>{
+        dispatch(fetchDeleteAddress(opt))
+      },opt)
+    }
     const deleteAddress = (id) => {
-      const opt = window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?");
-      if (!opt) return;
       dispatch(fetchDeleteAddress(id));
     };
     return (

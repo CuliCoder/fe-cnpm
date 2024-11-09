@@ -9,8 +9,6 @@ const Author = React.memo(() => {
   const id_author = useParams().id;
   const dispatch = useDispatch();
   const { authors, author_current } = useSelector((state) => state.author);
-  console.log("author_current", author_current);
-
   useEffect(() => {
     if (id_author == null) return;
     dispatch(findAuthor({ id: id_author }));

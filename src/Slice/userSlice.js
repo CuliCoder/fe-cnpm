@@ -159,6 +159,55 @@ export const fetchDeleteAddress = createAsyncThunk(
     }
   }
 );
+export const fetchAddOrder = createAsyncThunk(
+  "user/fetchAddOrder",
+  async (
+    {
+      employeeId,
+      fullname,
+      phoneNumber,
+      email,
+      address,
+      products,
+      note,
+      discount,
+      shipFee,
+      total,
+    },
+    { _, rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.post("/api/user/order/add", {
+        employeeId,
+        fullname,
+        phoneNumber,
+        email,
+        address,
+        products,
+        note,
+        discount,
+        shipFee,
+        total,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const fetchCancelOrder = createAsyncThunk(
+  "user/fetchCancelOrder",
+  async (id_order, { _, rejectWithValue }) => {
+    try {
+      const response = await axios.put("/api/user/order/cancel", {
+        id_order,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -203,6 +252,16 @@ const userSlice = createSlice({
       error: null,
       message: null,
     },
+    addOrder: {
+      loading: false,
+      error: null,
+      message: null,
+    },
+    cancelOrder:{
+      loading: false,
+      error: null,
+      message: null,
+    }
   },
   reducers: {
     clearChagneInfo: (state) => {
@@ -225,6 +284,14 @@ const userSlice = createSlice({
       state.deleteAddress.error = null;
       state.deleteAddress.message = null;
     },
+    clearAddOrder: (state) => {
+      state.addOrder.error = null;
+      state.addOrder.message = null;
+    },
+    clearCancelOrder: (state) => {
+      state.cancelOrder.error = null;
+      state.cancelOrder.message = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -332,6 +399,32 @@ const userSlice = createSlice({
         state.deleteAddress.error = action.payload.error;
         state.deleteAddress.message = action.payload.message;
         state.deleteAddress.loading = false;
+      })
+      .addCase(fetchAddOrder.pending, (state) => {
+        state.addOrder.loading = true;
+      })
+      .addCase(fetchAddOrder.fulfilled, (state, action) => {
+        state.addOrder.error = action.payload.error;
+        state.addOrder.message = action.payload.message;
+        state.addOrder.loading = false;
+      })
+      .addCase(fetchAddOrder.rejected, (state, action) => {
+        state.addOrder.error = action.payload.error;
+        state.addOrder.message = action.payload.message;
+        state.addOrder.loading = false;
+      })
+      .addCase(fetchCancelOrder.pending, (state) => {
+        state.cancelOrder.loading = true;
+      })
+      .addCase(fetchCancelOrder.fulfilled, (state, action) => {
+        state.cancelOrder.error = action.payload.error;
+        state.cancelOrder.message = action.payload.message;
+        state.cancelOrder.loading = false;
+      })
+      .addCase(fetchCancelOrder.rejected, (state, action) => {
+        state.cancelOrder.error = action.payload.error;
+        state.cancelOrder.message = action.payload.message;
+        state.cancelOrder.loading = false;
       });
   },
 });
@@ -342,4 +435,6 @@ export const {
   clearSelectAddress,
   clearEditAddress,
   clearDeleteAddress,
+  clearAddOrder,
+  clearCancelOrder,
 } = userSlice.actions;

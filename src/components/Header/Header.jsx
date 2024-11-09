@@ -203,11 +203,11 @@ export default function Header() {
 
       {/* Modal */}
       <div
-        className={`modal w-screen h-screen fixed right-0 top-0 end-0 ${enable} fixed z-20`}
+        className={`modal w-screen h-screen  fixed right-0 top-0 end-0 ${enable} fixed z-20`}
         onClick={handleCloseModal}
       >
         <div
-          className="modal-cart w-[400px] bg-white  h-screen right-0 absolute px-5 py-10 "
+          className="modal-cart w-[400px] h-screen hover:overflow-y-scroll bg-white right-0 absolute px-5 py-10 "
           onClick={(e) => {
             e.stopPropagation();
           }}
@@ -221,7 +221,7 @@ export default function Header() {
               <LiaTimesSolid />
             </div>
           </div>
-          <div className="mt-10 text-left">
+          <div className="mt-10 text-left ">
             {hasproducts ? (
               <div>
                 <div className="cart-mini relative">

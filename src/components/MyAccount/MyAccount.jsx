@@ -16,12 +16,14 @@ import {
   fetchInfoUser,
   fetchOrderUser,
   fetchChangeInfo,
+  fetchCancelOrder,
   clearChagneInfo,
   fetchSelectAddress,
   clearSelectAddress,
   clearAddAddress,
   clearEditAddress,
   clearDeleteAddress,
+  clearCancelOrder,
 } from "../../Slice/userSlice";
 import { fetchAddressWithId } from "../../Slice/userSlice";
 import { formatPrice } from "../../config/formatPrice";
@@ -32,7 +34,8 @@ import { setShowToast } from "../../Slice/MyToastSlice";
 import FormAddAddress from "./FormAddAddress";
 import RadioAddress from "./RadioAddress";
 import FormEditAddress from "./FromEditAddress";
-
+import { useMyContext } from "../../Context/ContextAPI";
+import { ConfirmModal } from "../ConfirmModal/ConfirmModal";
 const MyAccount = React.memo(() => {
   const [account, setAccount] = useState(true);
   const [order, setOrder] = useState(false);
@@ -60,6 +63,9 @@ const MyAccount = React.memo(() => {
   const addAddress = useSelector((state) => state.user.addAddress);
   const usereditAddress = useSelector((state) => state.user.editAddress);
   const userdeleteAddress = useSelector((state) => state.user.deleteAddress);
+  const userCancelOrder = useSelector((state) => state.user.cancelOrder);
+  const { setOpenConfirmModal } = useMyContext();
+  const [seletedOrder, setSelectedOrder] = useState(null);
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -74,11 +80,6 @@ const MyAccount = React.memo(() => {
       dispatch(fetchInfoUser());
     }
   }, [account, infoAccount]);
-  useEffect(() => {
-    if (address) {
-      dispatch(fetchAddressWithId());
-    }
-  }, [address]);
   useEffect(() => {
     if (order) {
       dispatch(fetchOrderUser());
@@ -238,6 +239,20 @@ const MyAccount = React.memo(() => {
       dispatch(fetchAddressWithId());
     }
   }, [userdeleteAddress.error]);
+  useEffect(() => {
+    if (userCancelOrder.error !== null) {
+      dispatch(
+        setShowToast({
+          show: true,
+          message: userCancelOrder.message,
+          type: userCancelOrder.error === 0 ? "success" : "error",
+        })
+      );
+      dispatch(clearCancelOrder());
+      dispatch(fetchOrderUser());
+    }
+  }, [userCancelOrder.error]);
+
   const handleSelectAddress = useCallback((id) => {
     dispatch(fetchSelectAddress(id));
   }, []);
@@ -245,8 +260,41 @@ const MyAccount = React.memo(() => {
     setOpenEditAddressForm(show);
     setEditAddress(item);
   }, []);
+  const handleComfirmModal = useCallback(() => {
+    dispatch(fetchCancelOrder(seletedOrder));
+  }, [seletedOrder]);
+  const setColor = (status) => {
+    switch (status) {
+      case 1:
+        return "info";
+      case 2:
+        return "pink";
+      case 3:
+        return "indigo";
+      case 4:
+        return "gray";
+      case 5:
+        return "purple";
+      case 6:
+        return "success";
+      case 7:
+        return "failure";
+      case 8:
+        return "failure";
+      case 9:
+        return "pink";
+      case 10:
+        return "success";
+      default:
+        return "info";
+    }
+  };
   return (
     <div>
+      <ConfirmModal
+        message="Bạn có chắc chắn muốn hủy đơn hàng này không?"
+        handleConfirmModal={handleComfirmModal}
+      />
       <div className="breadcrumb bg-[#f4f9fc] h-[110px] py-5 ">
         <div className="flex items-center justify-center">
           <a href="/" className="px-1">
@@ -405,15 +453,39 @@ const MyAccount = React.memo(() => {
                 <div>
                   <Accordion collapseAll>
                     {allOrderUser.orders.map((order) => (
-                      <Accordion.Panel>
+                      <Accordion.Panel key={order.id}>
                         <Accordion.Title className="flex items-center justify-between">
                           <div>Đơn hàng có mã {order.id}</div>
-                          <div>Ngày đặt: {order.order_date}</div>
+                          <div>
+                            Ngày đặt:{" "}
+                            {new Date(order.order_date).toLocaleString(
+                              "vi-VN",
+                              {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                              }
+                            )}
+                          </div>
                         </Accordion.Title>
                         <Accordion.Content>
                           <div>
                             <div>
-                              <div>Mã đơn: {order.id}</div>
+                              <div className="flex justify-between">
+                                Mã đơn: {order.id}
+                                <Button
+                                  color="failure"
+                                  onClick={() => {
+                                    setOpenConfirmModal(true);
+                                    setSelectedOrder(order.id);
+                                  }}
+                                >
+                                  Hủy
+                                </Button>
+                              </div>
                               {order.order_detail.map((product) => (
                                 <div
                                   className="flex items-center justify-between "
@@ -436,22 +508,12 @@ const MyAccount = React.memo(() => {
                                 </div>
                               ))}
                             </div>
-                            {order.status === 2 ? (
-                              <Badge
-                                color="warning"
-                                className="w-[100px] mt-2 ml-[90%]"
-                              >
-                                Chờ xác nhận
-                              </Badge>
-                            ) : (
-                              <Badge
-                                color="success"
-                                className="w-[100px] mt-2 ml-[90%]"
-                              >
-                                Đã giao hàng
-                              </Badge>
-                            )}
-
+                            <Badge
+                              color={setColor(order.status)}
+                              className="w-[100px] mt-2 ml-[90%]"
+                            >
+                              {order.name}
+                            </Badge>
                             <p className="text-2xl font-normal mt-5 ml-[70%]">
                               Tổng tiền:
                               {formatPrice(order.total_money)}
