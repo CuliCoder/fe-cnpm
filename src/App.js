@@ -52,11 +52,11 @@ function App() {
     dispatch(fetchProvinces());
     dispatch(fetchDistricts());
     dispatch(fetchWards());
-    dispatch(fetchAddressWithId());
   }, []);
   useEffect(() => {
     if (status.error === 0) {
       dispatch(fetchCart());
+      dispatch(fetchAddressWithId());
     }
   }, [status.error]);
   if (status.error === null) {

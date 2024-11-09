@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Carousel, Breadcrumb } from "flowbite-react";
-import { HiCheck } from "react-icons/hi";
-import { FaCartPlus } from "react-icons/fa";
 import { useParams, Link } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import { HiHome } from "react-icons/hi";
@@ -12,6 +10,7 @@ import { addProduct } from "../../Slice/cartSlice";
 import { formatPrice } from "../../config/formatPrice";
 import { fetchAddToCart } from "../../Slice/cartSlice";
 import { setShowToast } from "../../Slice/MyToastSlice";
+import ProductList from "../Products/ProductList";
 import "./ContentProduct.css";
 import "quill/dist/quill.snow.css";
 const ContentProduct = React.memo(() => {
@@ -47,6 +46,16 @@ const ContentProduct = React.memo(() => {
       })
     );
   }, [addToCart.loading, addToCart.error]);
+  const countPage = useMemo(
+    () => Math.ceil(productlimit.length / 4),
+    [productlimit]
+  );
+  const pages = useMemo(
+    () =>
+      Array.from({ length: countPage > 12 ? 12 : countPage }, (_, i) => i + 1),
+    [countPage]
+  );
+  const step = 4;
   return (
     <div className="relative">
       <div className="content pb-[120px]">
@@ -67,15 +76,17 @@ const ContentProduct = React.memo(() => {
         <div className="body-content flex gap-10  w-[1170px] m-auto py-[40px] px-[20px]">
           <div className="left w-[510px] h-[650px]">
             <div className="h-56 sm:h-64 xl:h-80 2xl:h-[600px]">
-              <Carousel className="">
+              <Carousel>
                 {currentProduct &&
-                  currentProduct.gallery.map((image) => (
-                    <img
-                      src={image}
-                      alt="..."
-                      className="w-[510px] object-cover"
-                    />
-                  ))}
+                  [...currentProduct.gallery]
+                    .reverse()
+                    .map((image) => (
+                      <img
+                        src={image}
+                        alt="..."
+                        className="w-[510px] object-cover"
+                      />
+                    ))}
               </Carousel>
             </div>
           </div>
@@ -224,112 +235,13 @@ const ContentProduct = React.memo(() => {
         <div className="text-left w-[1170px] m-auto py-20">
           <h1 className="font-medium text-md">SẢN PHẨM LIÊN QUAN</h1>
           <div className="h-56 sm:h-64 xl:h-80 2xl:h-96 py-5">
-            <Carousel>
-              <div className="flex justify-between gap-x-5 bg-slate-100">
-                {productlimit &&
-                  productlimit.slice(0, 4).map((product) => (
-                    <Link
-                      to={`/product/${product.id}`}
-                      key={product.id}
-                      className="h-[360px] product-item relative duration-1000 hover:cursor-pointer hover:shadow-md p-3"
-                    >
-                      <div className="h-[250px] object-cover">
-                        <img
-                          src={product.thumbnail}
-                          alt=""
-                          className="scale-90"
-                        />
-                      </div>
-                      <div className="name duration-100">
-                        <p className="mt-[40px] font-normal w-full mb-5">
-                          {product.title}
-                        </p>
-                        <span className="font-medium my-4">
-                          {product.price}₫
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        className={`h-[40px] w-11/12 m-auto bg-orange-500 text-white p-2 font-medium
-                    hover:bg-slate-900 duration-200 items-center justify-center absolute top-[80%] left-3
-                    `}
-                      >
-                        <FaCartPlus className="w-5 h-10 px-1" />
-                        THÊM VÀO GIỎ HÀNG
-                      </button>
-                    </Link>
-                  ))}
-              </div>
-              <div className="flex justify-between gap-x-5 bg-slate-100">
-                {productlimit &&
-                  productlimit.slice(4, 8).map((product) => (
-                    <Link
-                      to={`/product/${product.id}`}
-                      key={product.id}
-                      className="h-[360px] product-item relative duration-1000 hover:cursor-pointer hover:shadow-md p-3"
-                    >
-                      <div className="h-[250px] object-cover">
-                        <img
-                          src={product.thumbnail}
-                          alt=""
-                          className="scale-90"
-                        />
-                      </div>
-                      <div className="name duration-100">
-                        <p className="mt-[40px] font-normal w-full mb-5">
-                          {product.title}
-                        </p>
-                        <span className="font-medium my-4">
-                          {product.price}₫
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        className={`h-[40px] w-11/12 m-auto bg-orange-500 text-white p-2 font-medium
-                    hover:bg-slate-900 duration-200 items-center justify-center absolute top-[80%] left-3
-                    `}
-                      >
-                        <FaCartPlus className="w-5 h-10 px-1" />
-                        THÊM VÀO GIỎ HÀNG
-                      </button>
-                    </Link>
-                  ))}
-              </div>
-              <div className="flex justify-between gap-x-5 bg-slate-100">
-                {productlimit &&
-                  productlimit.slice(8, 12).map((product) => (
-                    <Link
-                      to={`/product/${product.id}`}
-                      key={product.id}
-                      className="h-[360px] product-item relative duration-1000 hover:cursor-pointer hover:shadow-md p-3"
-                    >
-                      <div className="h-[250px] object-cover">
-                        <img
-                          src={product.thumbnail}
-                          alt=""
-                          className="scale-90"
-                        />
-                      </div>
-                      <div className="name duration-100">
-                        <p className="mt-[40px] font-normal w-full mb-5">
-                          {product.title}
-                        </p>
-                        <span className="font-medium my-4">
-                          {product.price}₫
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        className={`h-[40px] w-11/12 m-auto bg-orange-500 text-white p-2 font-medium
-                    hover:bg-slate-900 duration-200 items-center justify-center absolute top-[80%] left-3
-                    `}
-                      >
-                        <FaCartPlus className="w-5 h-10 px-1" />
-                        THÊM VÀO GIỎ HÀNG
-                      </button>
-                    </Link>
-                  ))}
-              </div>
+            <Carousel className="h-100">
+              {pages.map((page) => {
+                const startIndex = (page - 1) * step;
+                const endIndex = startIndex + step;
+                const products = productlimit.slice(startIndex, endIndex);
+                return <ProductList products={products} />;
+              })}
             </Carousel>
           </div>
         </div>
