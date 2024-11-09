@@ -87,7 +87,11 @@ const ContentProduct = React.memo(() => {
               {currentProduct && formatPrice(currentProduct.price)}
             </p>
             <p className="quote italic text-thin text-sm tracking-widest ">
-              {currentProduct && currentProduct.introduce}
+              {currentProduct && (
+                <div
+                  dangerouslySetInnerHTML={{ __html: currentProduct.introduce }}
+                />
+              )}
             </p>
             <div className="flex pt-[40px] gap-5">
               <div className="product-quantity border-slate-300 flex border justify-center items-center py-1 px-1">
@@ -202,8 +206,8 @@ const ContentProduct = React.memo(() => {
                         key={cate.id}
                       >
                         {index === currentProduct.category.length - 1
-                          ? " " + cate.name
-                          : " " + cate.name + ","}{" "}
+                          ? " " + cate.label
+                          : " " + cate.label + ","}{" "}
                       </Link>
                     ))}
                 </span>
@@ -221,10 +225,10 @@ const ContentProduct = React.memo(() => {
             )}
           </div>
         </div>
-        <div className="text-left w-[1170px] m-auto py-20">
+        <div className="text-left w-[1170px] m-auto pt-20">
           <h1 className="font-medium text-md">SẢN PHẨM LIÊN QUAN</h1>
           <div className="h-56 sm:h-64 xl:h-80 2xl:h-96 py-5">
-            <Carousel>
+            <Carousel className="bg-white">
               <div className="flex justify-between gap-x-5 bg-slate-100">
                 {productlimit &&
                   productlimit.slice(0, 4).map((product) => (
