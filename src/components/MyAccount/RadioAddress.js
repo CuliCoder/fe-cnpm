@@ -1,16 +1,11 @@
-import React, { useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useDispatch } from "react-redux";
 import { fetchDeleteAddress } from "../../Slice/userSlice";
 import { useMyContext } from "../../Context/ContextAPI";
 const RadioAddress = React.memo(
-  ({ listAddress, selectAddress, editAddress }) => {
-  const { setOpenConfirmModal ,handleClick } = useMyContext();
+  ({ listAddress, editAddress }) => {
+    const { handleClick } = useMyContext();
     const dispatch = useDispatch();
-    const handleClickModal =(opt) =>{
-      handleClick(()=>{
-        dispatch(fetchDeleteAddress(opt))
-      },opt)
-    }
     const deleteAddress = (id) => {
       dispatch(fetchDeleteAddress(id));
     };

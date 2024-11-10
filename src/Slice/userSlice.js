@@ -170,7 +170,7 @@ export const fetchAddOrder = createAsyncThunk(
       address,
       products,
       note,
-      discount,
+      id_coupon,
       shipFee,
       total,
     },
@@ -185,7 +185,7 @@ export const fetchAddOrder = createAsyncThunk(
         address,
         products,
         note,
-        discount,
+        id_coupon,
         shipFee,
         total,
       });

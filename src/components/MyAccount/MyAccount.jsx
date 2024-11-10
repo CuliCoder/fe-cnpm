@@ -476,15 +476,17 @@ const MyAccount = React.memo(() => {
                             <div>
                               <div className="flex justify-between">
                                 Mã đơn: {order.id}
-                                <Button
-                                  color="failure"
-                                  onClick={() => {
-                                    setOpenConfirmModal(true);
-                                    setSelectedOrder(order.id);
-                                  }}
-                                >
-                                  Hủy
-                                </Button>
+                                {order.status === 1 && (
+                                  <Button
+                                    color="failure"
+                                    onClick={() => {
+                                      setOpenConfirmModal(true);
+                                      setSelectedOrder(order.id);
+                                    }}
+                                  >
+                                    Hủy
+                                  </Button>
+                                )}
                               </div>
                               {order.order_detail.map((product) => (
                                 <div
@@ -566,7 +568,18 @@ const MyAccount = React.memo(() => {
                               </span>
                             </p>
                             <p className="text-sm">
-                              Hạn sử dụng: {item.expiration_date}
+                              Hạn sử dụng:{" "}
+                              {new Date(item.expiration_date).toLocaleString(
+                                "vi-VN",
+                                {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  second: "2-digit",
+                                }
+                              )}
                             </p>
                           </div>
                         );

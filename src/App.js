@@ -44,6 +44,7 @@ function App() {
   const userAddOrder = useSelector((state) => state.user.addOrder);
   const userCancelOrder = useSelector((state) => state.user.cancelOrder);
   const userEditAddress = useSelector((state) => state.user.editAddress);
+  const discount = useSelector((state) => state.discount.discount);
   useEffect(() => {
     dispatch(check_status());
     dispatch(fetchAllProducts());
@@ -74,6 +75,7 @@ function App() {
         userAddOrder.loading ||
         userCancelOrder.loading ||
         userEditAddress.loading ||
+        discount.loading ||
         addCart.loading) && <Spinner />}
       <Routes>
         <Route
