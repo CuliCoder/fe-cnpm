@@ -514,9 +514,16 @@ const MyAccount = React.memo(() => {
                             >
                               {order.name}
                             </Badge>
+                            <p className="text-x font-normal mt-5 ml-[70%]">
+                              Phí vận chuyển:
+                              {" " + formatPrice(order.shipFee)}
+                            </p>
+                            <p className="text-x font-normal mt-5 ml-[70%]">
+                              Được giảm: - {formatPrice(order.discount)}
+                            </p>
                             <p className="text-2xl font-normal mt-5 ml-[70%]">
                               Tổng tiền:
-                              {formatPrice(order.total_money)}
+                              {" " + formatPrice(order.total_money)}
                             </p>
                           </div>
                         </Accordion.Content>

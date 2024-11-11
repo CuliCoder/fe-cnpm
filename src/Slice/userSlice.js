@@ -178,7 +178,6 @@ export const fetchAddOrder = createAsyncThunk(
   ) => {
     try {
       const response = await axios.post("/api/user/order/add", {
-        employeeId,
         fullname,
         phoneNumber,
         email,
@@ -186,8 +185,6 @@ export const fetchAddOrder = createAsyncThunk(
         products,
         note,
         id_coupon,
-        shipFee,
-        total,
       });
       return response.data;
     } catch (error) {
@@ -257,11 +254,11 @@ const userSlice = createSlice({
       error: null,
       message: null,
     },
-    cancelOrder:{
+    cancelOrder: {
       loading: false,
       error: null,
       message: null,
-    }
+    },
   },
   reducers: {
     clearChagneInfo: (state) => {
@@ -291,7 +288,7 @@ const userSlice = createSlice({
     clearCancelOrder: (state) => {
       state.cancelOrder.error = null;
       state.cancelOrder.message = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder

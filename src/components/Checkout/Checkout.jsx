@@ -14,6 +14,7 @@ import {
   setCodeDiscount,
   clearDiscount,
 } from "../../Slice/discountSlice";
+import { fetchAllProducts } from "../../Slice/products";
 const Checkout = React.memo(() => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -47,6 +48,7 @@ const Checkout = React.memo(() => {
   const dataWards = useSelector((state) => state.address.wards);
   const [isChange, setIsChange] = useState(false);
   const userAddOrder = useSelector((state) => state.user.addOrder);
+
   useEffect(() => {
     if (
       userAddress.list.length > 0 &&
@@ -149,7 +151,6 @@ const Checkout = React.memo(() => {
     }
     dispatch(
       fetchAddOrder({
-        employeeId: null,
         fullname: `${firstName} ${lastName}`,
         phoneNumber: phoneNumber,
         email: email,
@@ -157,14 +158,15 @@ const Checkout = React.memo(() => {
         products: productInCart,
         note: note,
         id_coupon: discount.id,
-        shipFee: shipFee,
-        total: currentPrice,
       })
     );
   };
   useEffect(() => {
     if (userAddOrder.error !== null) {
-      userAddOrder.error === 0 && dispatch(clearDiscount()) && navigate("/");
+      userAddOrder.error === 0 &&
+        dispatch(clearDiscount()) &&
+        dispatch(fetchAllProducts()) &&
+        navigate("/");
       dispatch(
         setShowToast({
           show: true,
@@ -514,7 +516,7 @@ const Checkout = React.memo(() => {
                       <img src={product.thumbnail} alt="" />
                     </div>
                     <Link
-                      to="/product/:product-id"
+                      to={`/product/${product.id}`}
                       className="w-[218px] font-semibold"
                     >
                       <p>{product.name}</p>
