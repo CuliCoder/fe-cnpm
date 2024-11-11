@@ -36,10 +36,6 @@ const Checkout = React.memo(() => {
   const [shipFee, setShipFee] = useState(0);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [isLoad, setLoad] = useState(true);
-  const [currentDiscount, setCurrentDiscount] = useState({
-    id: null,
-    value: 0,
-  });
   const [inputDiscount, setInputDiscount] = useState("");
   const userAddress = useSelector((state) => state.user.address);
   const dispatch = useDispatch();

@@ -4,9 +4,10 @@ import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import "./Login.css";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../Slice/loginSlice.js";
+import { login, clearStateLogin } from "../../Slice/loginSlice.js";
 import Spinner from "../Spinner/Spinner.js";
 import { check_status } from "../../Slice/status.js";
+import { setShowToast } from "../../Slice/MyToastSlice.js";
 export default function Login() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -14,18 +15,26 @@ export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, message, error } = useSelector((state) => state.login);
-  const [notification, setNotification] = useState("");
   const status = useSelector((state) => state.status);
   const handleLogin = () => {
     dispatch(login({ email, password }));
   };
-  useEffect(() => {
-    setNotification(message || "");
-  }, [message]);
+
   useEffect(() => {
     if (error === 0) {
       dispatch(check_status());
       navigate("/");
+    }
+    if (error !== null) {
+      console.log("error", error);
+      dispatch(
+        setShowToast({
+          show: true,
+          message: message,
+          type: error === 0 ? "success" : "error",
+        })
+      );
+      dispatch(clearStateLogin());
     }
   }, [error]);
   if (status.loading) {
@@ -137,7 +146,6 @@ export default function Login() {
           >
             Đăng Nhập
           </button>
-          {message && <p className="font-thin text-red-600">{message}</p>}
         </div>
       </div>
     </div>

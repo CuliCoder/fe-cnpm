@@ -10,7 +10,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaTachometerAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../Slice/status";
-import { setIsLogin } from "../../Slice/loginSlice";
 import {
   fetchCouponUser,
   fetchInfoUser,
@@ -69,10 +68,9 @@ const MyAccount = React.memo(() => {
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
-    setOpenModal(true);
     dispatch(logout());
-    dispatch(setIsLogin(1));
     dispatch(clearCart());
+    setOpenModal(false);
     navigate("/login");
   };
   useEffect(() => {

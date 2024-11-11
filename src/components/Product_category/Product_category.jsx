@@ -32,7 +32,7 @@ const Product_category = React.memo(() => {
     if (byUpdatedAt) {
       dispatch(getProductsByCategory({ category_id, byUpdatedAt }));
     }
-  }, [byUpdatedAt]);
+  }, [byUpdatedAt, category_id]);
   useEffect(() => {
     const handleFillProduct = () => {
       switch (fillterValue) {

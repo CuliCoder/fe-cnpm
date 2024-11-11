@@ -45,6 +45,7 @@ function App() {
   const userCancelOrder = useSelector((state) => state.user.cancelOrder);
   const userEditAddress = useSelector((state) => state.user.editAddress);
   const discount = useSelector((state) => state.discount.discount);
+  const userchangeInfo = useSelector((state) => state.user.changeInfo);
   useEffect(() => {
     dispatch(check_status());
     dispatch(fetchAllProducts());
@@ -76,6 +77,7 @@ function App() {
         userCancelOrder.loading ||
         userEditAddress.loading ||
         discount.loading ||
+        userchangeInfo.loading ||
         addCart.loading) && <Spinner />}
       <Routes>
         <Route
@@ -167,7 +169,7 @@ function App() {
           path="/recover-password"
           element={
             <Layout>
-              <ForgotPassword />
+              {status.error === 0 ? <MyAccount /> : <ForgotPassword />}
             </Layout>
           }
         ></Route>
