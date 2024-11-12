@@ -28,7 +28,8 @@ export default function Register() {
     dispatch(registerAction.checkCode({ email, code }));
   };
 
-  const handleRegister = async () => {
+  const handleRegister = (e) => {
+    e.preventDefault();
     dispatch(registerAction.registerUser({ email, password, confirmPassword }));
   };
   useEffect(() => {
@@ -120,7 +121,7 @@ export default function Register() {
               </>
             )}
             {checkCode.error === 0 && (
-              <div>
+              <form onSubmit={handleRegister}>
                 <div className="flex mt-10">
                   <p className="font-thin">Nhập mật khẩu</p>{" "}
                   <span className="inline text-[red]">*</span>
@@ -129,7 +130,6 @@ export default function Register() {
                   <input
                     type="password"
                     name="password"
-                    id=""
                     className="outline-none border w-full my-2 px-2 py-2"
                     placeholder=" Mật khẩu"
                     onChange={(e) => {
@@ -156,9 +156,8 @@ export default function Register() {
                   />
                 </div>
                 <button
-                  type="button"
+                  type="submit"
                   className="h-full w-[150px] bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200 my-10"
-                  onClick={handleRegister}
                 >
                   Đăng Ký
                 </button>
@@ -167,7 +166,7 @@ export default function Register() {
                     {registerUser.message}
                   </p>
                 }
-              </div>
+              </form>
             )}
           </div>
         </div>

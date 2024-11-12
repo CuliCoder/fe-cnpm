@@ -14,7 +14,9 @@ import {
   setCodeDiscount,
   clearDiscount,
 } from "../../Slice/discountSlice";
+import { clearCart } from "../../Slice/cartSlice.js";
 import { fetchAllProducts } from "../../Slice/products";
+import axios from "../../config/configAxios.js";
 const Checkout = React.memo(() => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -161,11 +163,24 @@ const Checkout = React.memo(() => {
       })
     );
   };
+  const clearCartSystem = async () => {
+    setLoad(true);
+    await axios
+      .delete("/api/cart/clearCart")
+      .then((res) => {
+        setLoad(false);
+      })
+      .catch((err) => {
+        setLoad(false);
+      });
+  };
   useEffect(() => {
     if (userAddOrder.error !== null) {
       userAddOrder.error === 0 &&
         dispatch(clearDiscount()) &&
         dispatch(fetchAllProducts()) &&
+        dispatch(clearCart()) &&
+        clearCartSystem() &&
         navigate("/");
       dispatch(
         setShowToast({

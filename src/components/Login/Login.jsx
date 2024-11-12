@@ -16,7 +16,18 @@ export default function Login() {
   const navigate = useNavigate();
   const { loading, message, error } = useSelector((state) => state.login);
   const status = useSelector((state) => state.status);
-  const handleLogin = () => {
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      dispatch(
+        setShowToast({
+          show: true,
+          message: "Vui lòng nhập đầy đủ thông tin",
+          type: "error",
+        })
+      );
+      return;
+    }
     dispatch(login({ email, password }));
   };
 
@@ -26,7 +37,6 @@ export default function Login() {
       navigate("/");
     }
     if (error !== null) {
-      console.log("error", error);
       dispatch(
         setShowToast({
           show: true,
@@ -40,12 +50,6 @@ export default function Login() {
   if (status.loading) {
     return <Spinner />;
   }
-
-  const handlePressEnter = (e) => {
-    if (e.key === "Enter") {
-      handleLogin();
-    }
-  };
   return (
     <div>
       {loading && <Spinner />}
@@ -58,23 +62,18 @@ export default function Login() {
         </div>
         <div className="text-3xl font-bold text-center">Tài khoản của tôi</div>
       </div>
-      <div className="py-[60px] bg-white ">
+      <form className="py-[60px] bg-white " onSubmit={handleLogin}>
         <p className="text-6xl text-slate-200 font-thin mb-3 text-center">
           #my account
         </p>
         <p className="text-3xl font-bold text-center">Đăng nhập vào hệ thống</p>
         <div className="w-[560px] p-[20px] m-auto mt-14 text-left relative">
           <div className="flex">
-            <p className="font-thin">
-              Tên hoặc địa chỉ email đã đăng ký của bạn
-            </p>
+            <p className="font-thin">Địa chỉ email đã đăng ký của bạn</p>
             <span className="inline text-[red]">*</span>
           </div>
           <input
             type="email"
-            pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"
-            name=""
-            id=""
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -90,13 +89,6 @@ export default function Login() {
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key == "Enter") {
-                handleLogin();
-              }
-            }}
-            name=""
-            id=""
             autoComplete="off"
             className="outline-none border w-full my-2 px-2 py-2 focus:shadow"
           />
@@ -113,11 +105,6 @@ export default function Login() {
             className="hidden"
             value={showPassword}
             onChange={() => setShowPassword((prev) => !prev)}
-            onKeyDown={(e) => {
-              if (e.key == "Enter") {
-                handleLogin();
-              }
-            }}
           />
 
           <input
@@ -140,14 +127,13 @@ export default function Login() {
             <p className="text-orange-500 font-thin">Tạo tài khoản mới</p>
           </Link>
           <button
-            type="button"
+            type="submit"
             className="h-full w-[150px] bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200 my-10"
-            onClick={handleLogin}
           >
             Đăng Nhập
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

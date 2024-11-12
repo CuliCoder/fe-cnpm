@@ -23,6 +23,7 @@ import { fetchAllCategory } from "./Slice/categorySlice";
 import { fetchCart } from "./Slice/cartSlice";
 import { fetchAllAuthor } from "./Slice/authorSlice.js";
 import Author from "./components/Author/Author.js";
+import { clearCart } from "./Slice/cartSlice";
 import {
   fetchProvinces,
   fetchDistricts,
@@ -46,6 +47,8 @@ function App() {
   const userEditAddress = useSelector((state) => state.user.editAddress);
   const discount = useSelector((state) => state.discount.discount);
   const userchangeInfo = useSelector((state) => state.user.changeInfo);
+  const usergetOrder = useSelector((state) => state.user.order);
+  const usergetCoupon = useSelector((state) => state.user.coupon);
   useEffect(() => {
     dispatch(check_status());
     dispatch(fetchAllProducts());
@@ -59,6 +62,9 @@ function App() {
     if (status.error === 0) {
       dispatch(fetchCart());
       dispatch(fetchAddressWithId());
+    }
+    if (status.error === 1) {
+      dispatch(clearCart());
     }
   }, [status.error]);
   if (status.error === null) {
@@ -78,6 +84,8 @@ function App() {
         userEditAddress.loading ||
         discount.loading ||
         userchangeInfo.loading ||
+        usergetOrder.loading ||
+        usergetCoupon.loading ||
         addCart.loading) && <Spinner />}
       <Routes>
         <Route

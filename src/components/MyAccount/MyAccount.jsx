@@ -69,7 +69,7 @@ const MyAccount = React.memo(() => {
   const dispatch = useDispatch();
   const handleLogout = () => {
     dispatch(logout());
-    dispatch(clearCart());
+    // dispatch(clearCart());
     setOpenModal(false);
     navigate("/login");
   };

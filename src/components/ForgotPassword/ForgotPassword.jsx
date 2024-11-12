@@ -67,7 +67,7 @@ export default function ForgotPassword() {
           </div>
         </div>
         <div className="py-[60px] bg-white w-[1170px] m-auto">
-          <form className="text-left" onSubmit={(e) => handleSubmit(e)}>
+          <form className="text-left" onSubmit={handleSubmit}>
             <p className="font-thin text-sm">
               Quên mật khẩu? Vui lòng nhập địa chỉ email. Bạn sẽ nhận được một
               mật khẩu mới qua email.
@@ -86,8 +86,7 @@ export default function ForgotPassword() {
               }}
             />
             <button
-              onClick={(e) => handleSubmit(e)}
-              type="button"
+              type="submit"
               className="h-full w-[200px] bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200 my-10 block"
             >
               Đặt lại mật khẩu

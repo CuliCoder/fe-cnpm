@@ -272,6 +272,7 @@ export default function Header() {
                             : "/login"
                           : ""
                       }
+                      onClick={handleCloseModal}
                       className="w-full h-[46px] bg-orange-500 text-white flex items-center justify-center mt-5 rounded-sm hover:bg-slate-400 hover:cursor-pointer duration-75 font-medium"
                     >
                       <FaLock />
@@ -280,6 +281,7 @@ export default function Header() {
                     <Link
                       to="/cart"
                       className="w-full h-[46px] bg-white text-slate-950 flex items-center justify-center mt-5 border-slate-700 rounded-sm hover:bg-orange-500 hover:cursor-pointer hover:text-white duration-75 font-medium"
+                      onClick={handleCloseModal}
                     >
                       <BsCart />
                       <p>Giỏ Hàng</p>
@@ -293,6 +295,7 @@ export default function Header() {
                 <Link
                   to="/products"
                   className="w-60 h-[46px] bg-orange-500 text-white flex items-center justify-center mt-5 rounded-sm hover:bg-slate-400 hover:cursor-pointer duration-75 font-medium"
+                  onClick={handleCloseModal}
                 >
                   <p> TIẾP TỤC MUA SẮM</p>
                 </Link>

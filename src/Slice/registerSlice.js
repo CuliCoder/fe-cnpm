@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../config/configAxios";
-
+import * as regex from "../utils/regex";
 export const register = createAsyncThunk(
   "register/register",
   async (data) => {}
@@ -10,8 +10,7 @@ export const getCode = createAsyncThunk(
   "register/getCode",
   async (email, { _, rejectWithValue }) => {
     try {
-      let rgEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!rgEmail.test(email)) {
+      if (!regex.rgEmail.test(email)) {
         return { error: 1, message: "Email không hợp lệ" };
       }
       const response = await axios.post("/auth/sendCode", { email });
@@ -25,8 +24,7 @@ export const checkCode = createAsyncThunk(
   "register/checkCode",
   async ({ email, code }, { rejectWithValue }) => {
     try {
-      let rgEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!rgEmail.test(email)) {
+      if (!regex.rgEmail.test(email)) {
         return { error: 1, message: "Email không hợp lệ" };
       }
       if (code === "" || code === null) {
@@ -43,15 +41,13 @@ export const registerUser = createAsyncThunk(
   "register/registerUser",
   async ({ email, password, confirmPassword }, { rejectWithValue }) => {
     try {
-      let rgEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!rgEmail.test(email)) {
+      if (!regex.rgEmail.test(email)) {
         return { error: 1, message: "Email không hợp lệ" };
       }
-      let rgPw = /^(?=.*[A-Z]).{8,}$/;
       if (!password) {
         return { error: 1, message: "Mật khẩu không được để trống" };
       }
-      if (!rgPw.test(password)) {
+      if (!regex.rgPw.test(password)) {
         return {
           error: 1,
           message:
@@ -95,7 +91,7 @@ const registerSlice = createSlice({
       state.checkCode.message = "";
       state.registerUser.error = null;
       state.registerUser.message = "";
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
