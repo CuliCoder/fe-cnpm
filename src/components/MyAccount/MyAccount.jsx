@@ -557,9 +557,16 @@ const MyAccount = React.memo(() => {
                             <p className="font-semibold">
                               Mã: {item.coupon_code}{" "}
                               <span
-                                className="border text-center bg-gray-300 leading-[8px] px-1 cursor-pointer"
+                                className="border text-center bg-gray-300 leading-[8px] px-1 cursor-pointer rounded-sm"
                                 onClick={() => {
                                   handleCopyToClipboard(item.coupon_code);
+                                  dispatch(
+                                    setShowToast({
+                                      show: true,
+                                      message: "Đã copy mã giảm giá",
+                                      type: "success",
+                                    })
+                                  );
                                 }}
                               >
                                 copy
@@ -587,7 +594,9 @@ const MyAccount = React.memo(() => {
                 </p>
                 <button
                   className="text-[#fd6d4f] flex items-center space-x-1"
-                  onClick={() => setAddressForm(true)}
+                  onClick={() => {
+                    setAddressForm(true);
+                  }}
                 >
                   <CiEdit className="fill-[#fd6e4f] " />
                   <span>Thêm</span>
