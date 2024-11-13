@@ -1,10 +1,12 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { fetchDeleteAddress } from "../../Slice/userSlice";
-import { useMyContext } from "../../Context/ContextAPI";
 const RadioAddress = React.memo(
-  ({ listAddress, editAddress }) => {
-    const { handleClick } = useMyContext();
+  ({ listAddress, editAddress, selectAddress }) => {
+    const handleClick = (event, id) => {
+      event.stopPropagation();
+      selectAddress(id);
+    };
     const dispatch = useDispatch();
     const deleteAddress = (id) => {
       dispatch(fetchDeleteAddress(id));
