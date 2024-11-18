@@ -1,4 +1,5 @@
 import axios from "axios";
+
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -72,11 +73,15 @@ instance.interceptors.response.use(
           .catch((error) => {
             processQueue(error);
             reject(error);
+            window.location.href = "/";
           })
           .finally(() => {
             isRefreshing = false;
           });
       });
+    }
+    if (error.response.data.code === 2) {
+      window.location.href = "/";
     }
     return Promise.reject(error);
   }

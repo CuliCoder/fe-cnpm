@@ -10,7 +10,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaTachometerAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../Slice/status";
-import { setIsLogin } from "../../Slice/loginSlice";
 import {
   fetchCouponUser,
   fetchInfoUser,
@@ -69,10 +68,9 @@ const MyAccount = React.memo(() => {
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
-    setOpenModal(true);
     dispatch(logout());
-    dispatch(setIsLogin(1));
-    dispatch(clearCart());
+    // dispatch(clearCart());
+    setOpenModal(false);
     navigate("/login");
   };
   useEffect(() => {
@@ -476,15 +474,17 @@ const MyAccount = React.memo(() => {
                             <div>
                               <div className="flex justify-between">
                                 Mã đơn: {order.id}
-                                <Button
-                                  color="failure"
-                                  onClick={() => {
-                                    setOpenConfirmModal(true);
-                                    setSelectedOrder(order.id);
-                                  }}
-                                >
-                                  Hủy
-                                </Button>
+                                {order.status === 1 && (
+                                  <Button
+                                    color="failure"
+                                    onClick={() => {
+                                      setOpenConfirmModal(true);
+                                      setSelectedOrder(order.id);
+                                    }}
+                                  >
+                                    Hủy
+                                  </Button>
+                                )}
                               </div>
                               {order.order_detail.map((product) => (
                                 <div
@@ -514,9 +514,16 @@ const MyAccount = React.memo(() => {
                             >
                               {order.name}
                             </Badge>
+                            <p className="text-x font-normal mt-5 ml-[70%]">
+                              Phí vận chuyển:
+                              {" " + formatPrice(order.shipFee)}
+                            </p>
+                            <p className="text-x font-normal mt-5 ml-[70%]">
+                              Được giảm: - {formatPrice(order.discount)}
+                            </p>
                             <p className="text-2xl font-normal mt-5 ml-[70%]">
                               Tổng tiền:
-                              {formatPrice(order.total_money)}
+                              {" " + formatPrice(order.total_money)}
                             </p>
                           </div>
                         </Accordion.Content>
@@ -573,7 +580,18 @@ const MyAccount = React.memo(() => {
                               </span>
                             </p>
                             <p className="text-sm">
-                              Hạn sử dụng: {item.expiration_date}
+                              Hạn sử dụng:{" "}
+                              {new Date(item.expiration_date).toLocaleString(
+                                "vi-VN",
+                                {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  second: "2-digit",
+                                }
+                              )}
                             </p>
                           </div>
                         );

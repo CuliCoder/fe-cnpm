@@ -84,6 +84,7 @@ const cartSlice = createSlice({
       message: null,
       error: null,
     },
+
   },
   reducers: {
     addProduct: (state, action) => {

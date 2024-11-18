@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { FaTimes } from "react-icons/fa";
@@ -14,22 +14,24 @@ import {
   changeQuantity,
   removeFromCart,
 } from "../../Slice/cartSlice";
-import { setDiscountCode, clearDiscountCode } from "../../Slice/discountSlice";
 import { formatPrice } from "../../config/formatPrice";
 import { setShowToast } from "../../Slice/MyToastSlice";
-import axios from "../../config/configAxios";
-
+import {
+  fetchApplyDiscount,
+  clearApplyDiscount,
+  setCodeDiscount,
+  clearDiscount,
+} from "../../Slice/discountSlice";
 export default function Cart() {
   const itemsOfCart = useSelector((state) => state.cart.getCart.items);
   const [currentPrice, setCurrentPrice] = useState(0);
-  const [currentDiscount, setCurrentDiscount] = useState(0);
+
   const [inputDiscount, setInputDiscount] = useState("");
 
   const [status_login, setStatus_login] = useState(false);
   const status = useSelector((state) => state.status);
-
   const products = useSelector((state) => state.products.products_page);
-  const discount = useSelector((state) => state.discount);
+  const discount = useSelector((state) => state.discount.discount);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const increaseItem = (item) => {
@@ -83,8 +85,8 @@ export default function Cart() {
     navigate("/checkout");
   };
 
-  const checkDiscountValid = async () => {
-    if (discount == "") {
+  const checkDiscountValid = () => {
+    if (inputDiscount == "") {
       dispatch(
         setShowToast({
           show: true,
@@ -92,42 +94,46 @@ export default function Cart() {
           message: "Vui lòng nhập mã giảm giá",
         })
       );
-    } else {
-      let res = await axios.post(`/api/user/check-coupon`, {
-        coupon: inputDiscount.trim(),
-        value_apply: currentPrice,
-      });
-
-      if (res.status === 200) {
-        if (res.data[0]?.discount_value) {
-          const discountValue = parseFloat(
-            res.data[0].discount_value.replace("%", "")
-          );
-          const discountAmount = (currentPrice * discountValue) / 100;
-          setCurrentDiscount(discountAmount);
-          dispatch(
-            setShowToast({
-              show: true,
-              type: "success",
-              message: "Áp dụng mã giảm giá thành công",
-            })
-          );
-          dispatch(
-            setDiscountCode({ code: inputDiscount, negative: discountAmount })
-          );
-        } else {
-          dispatch(
-            setShowToast({
-              show: true,
-              type: "error",
-              message: res.data.message,
-            })
-          );
-          dispatch(clearDiscountCode());
-        }
-      }
+      dispatch(clearDiscount());
+      return;
     }
+    dispatch(
+      fetchApplyDiscount({
+        coupon: inputDiscount,
+        value_apply: currentPrice,
+      })
+    );
   };
+  useEffect(() => {
+    if (discount.error !== null) {
+      dispatch(
+        setShowToast({
+          show: true,
+          type: discount.error === 1 ? "error" : "success",
+          message: discount.message,
+        })
+      );
+      discount.error === 0
+        ? dispatch(setCodeDiscount(inputDiscount))
+        : dispatch(clearDiscount());
+      dispatch(clearApplyDiscount());
+    }
+  }, [discount.error]);
+  useEffect(() => {
+    setInputDiscount(discount.code);
+  }, [discount.code]);
+  const carculatePrice = (price, discount) => {
+    if (!discount) return price;
+    return price - discountValue(price, discount);
+  };
+  const discountValue = (price, discount) => {
+    const discountValue = discount.replace("%", "");
+    return (price * discountValue) / 100;
+  };
+  const priceDiscount = useMemo(
+    () => carculatePrice(currentPrice, discount.value),
+    [currentPrice, discount.value]
+  );
   return (
     <div>
       <div className="cart relative">
@@ -201,8 +207,7 @@ export default function Cart() {
             <div className="coupons border-gray-700 border-solid border p-1 rounded-sm">
               <input
                 type="text"
-                name=""
-                id=""
+                value={inputDiscount}
                 placeholder="Nhập mã giảm giá"
                 onChange={(e) => setInputDiscount(e.target.value)}
                 className="border-none outline-none w-[300px] px-2"
@@ -241,7 +246,12 @@ export default function Cart() {
                 <div className="flex justify-between items-center">
                   <p className="text-thin text-sm">Khuyến mãi</p>
                   <span className="inline-block font-bold">
-                    - {formatPrice(currentDiscount)}
+                    -{" "}
+                    {formatPrice(
+                      discount.value
+                        ? discountValue(currentPrice, discount.value)
+                        : 0
+                    )}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -253,7 +263,7 @@ export default function Cart() {
                 <div className="flex justify-between items-center">
                   <p className="text-thin text-sm">Tổng</p>
                   <span className="inline-block font-bold">
-                    {formatPrice(currentPrice - currentDiscount)}
+                    {formatPrice(priceDiscount)}
                   </span>
                 </div>
                 <div>

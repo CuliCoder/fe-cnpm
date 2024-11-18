@@ -24,6 +24,10 @@ const loginSlice = createSlice({
     setIsLogin: (state, action) => {
       state.error = action.payload;
     },
+    clearStateLogin: (state) => {
+      state.error = null;
+      state.message = "";
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -38,8 +42,9 @@ const loginSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.message = action.payload.message;
+        state.error = action.payload.error;
       });
   },
 });
 export default loginSlice.reducer;
-export const { setIsLogin } = loginSlice.actions;
+export const { setIsLogin, clearStateLogin } = loginSlice.actions;

@@ -24,6 +24,7 @@ export default function Header() {
   const [status_login, setStatus_login] = useState(false);
   const status = useSelector((state) => state.status);
   const authors = useSelector((state) => state.author.authors);
+  const categorys = useSelector((state) => state.category.categories);
   const navigate = useNavigate();
   useEffect(() => {
     setStatus_login(status.error === 0);
@@ -76,23 +77,23 @@ export default function Header() {
                   <p className="title font-bold">TÁC GIẢ TIÊU BIỂU</p>
                   <ul>
                     {authors.map((author) => (
-                      <Link to={"/author/"+author.value}>
-                      <li className="mt-7">{author.label}</li>
-                    </Link>
+                      <Link to={"/author/" + author.value}>
+                        <li className="mt-7">{author.label}</li>
+                      </Link>
                     ))}
                   </ul>
                 </div>
                 <div className="col-2">
                   <p className="title font-bold">SÁCH</p>
                   <ul>
-                    <li className="mt-7">Sách Ảnh</li>
-                    <li className="mt-7">Sách Chiêm Tinh – Horoscope</li>
-                    <li className="mt-7">Sách Chiêm Tinh – Horoscope</li>
-                    <li className="mt-7">Sách Chiêm Tinh – Horoscope</li>
-                    <li className="mt-7">Sách Chiêm Tinh – Horoscope</li>
+                    {categorys.map((category) => (
+                      <Link to={"/products/category/" + category.value}>
+                        <li className="mt-7">{category.label}</li>
+                      </Link>
+                    ))}
                   </ul>
                 </div>
-                <div className="col-3">
+                {/* <div className="col-3">
                   <p className="title font-bold">CÁC SẢN PHẨM KHÁC</p>
                   <ul>
                     <li className="mt-7">Huy Hiệu Tráng Men</li>
@@ -101,7 +102,7 @@ export default function Header() {
                     <li className="mt-7">Huy Hiệu Tráng Men</li>
                     <li className="mt-7">Huy Hiệu Tráng Men</li>
                   </ul>
-                </div>
+                </div> */}
               </div>
             </Link>
 
@@ -271,6 +272,7 @@ export default function Header() {
                             : "/login"
                           : ""
                       }
+                      onClick={handleCloseModal}
                       className="w-full h-[46px] bg-orange-500 text-white flex items-center justify-center mt-5 rounded-sm hover:bg-slate-400 hover:cursor-pointer duration-75 font-medium"
                     >
                       <FaLock />
@@ -279,6 +281,7 @@ export default function Header() {
                     <Link
                       to="/cart"
                       className="w-full h-[46px] bg-white text-slate-950 flex items-center justify-center mt-5 border-slate-700 rounded-sm hover:bg-orange-500 hover:cursor-pointer hover:text-white duration-75 font-medium"
+                      onClick={handleCloseModal}
                     >
                       <BsCart />
                       <p>Giỏ Hàng</p>
@@ -292,6 +295,7 @@ export default function Header() {
                 <Link
                   to="/products"
                   className="w-60 h-[46px] bg-orange-500 text-white flex items-center justify-center mt-5 rounded-sm hover:bg-slate-400 hover:cursor-pointer duration-75 font-medium"
+                  onClick={handleCloseModal}
                 >
                   <p> TIẾP TỤC MUA SẮM</p>
                 </Link>

@@ -1,14 +1,13 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { fetchDeleteAddress } from "../../Slice/userSlice";
 const RadioAddress = React.memo(
-  ({ listAddress, selectAddress, editAddress }) => {
+  ({ listAddress, editAddress, selectAddress }) => {
     const handleClick = (event, id) => {
       event.stopPropagation();
       selectAddress(id);
     };
     const dispatch = useDispatch();
-
     const deleteAddress = (id) => {
       dispatch(fetchDeleteAddress(id));
     };

@@ -23,6 +23,7 @@ import { fetchAllCategory } from "./Slice/categorySlice";
 import { fetchCart } from "./Slice/cartSlice";
 import { fetchAllAuthor } from "./Slice/authorSlice.js";
 import Author from "./components/Author/Author.js";
+import { clearCart } from "./Slice/cartSlice";
 import {
   fetchProvinces,
   fetchDistricts,
@@ -44,6 +45,10 @@ function App() {
   const userAddOrder = useSelector((state) => state.user.addOrder);
   const userCancelOrder = useSelector((state) => state.user.cancelOrder);
   const userEditAddress = useSelector((state) => state.user.editAddress);
+  const discount = useSelector((state) => state.discount.discount);
+  const userchangeInfo = useSelector((state) => state.user.changeInfo);
+  const usergetOrder = useSelector((state) => state.user.order);
+  const usergetCoupon = useSelector((state) => state.user.coupon);
   useEffect(() => {
     dispatch(check_status());
     dispatch(fetchAllProducts());
@@ -52,11 +57,14 @@ function App() {
     dispatch(fetchProvinces());
     dispatch(fetchDistricts());
     dispatch(fetchWards());
-    dispatch(fetchAddressWithId());
   }, []);
   useEffect(() => {
     if (status.error === 0) {
       dispatch(fetchCart());
+      dispatch(fetchAddressWithId());
+    }
+    if (status.error === 1) {
+      dispatch(clearCart());
     }
   }, [status.error]);
   if (status.error === null) {
@@ -74,6 +82,10 @@ function App() {
         userAddOrder.loading ||
         userCancelOrder.loading ||
         userEditAddress.loading ||
+        discount.loading ||
+        userchangeInfo.loading ||
+        usergetOrder.loading ||
+        usergetCoupon.loading ||
         addCart.loading) && <Spinner />}
       <Routes>
         <Route
@@ -165,7 +177,7 @@ function App() {
           path="/recover-password"
           element={
             <Layout>
-              <ForgotPassword />
+              {status.error === 0 ? <MyAccount /> : <ForgotPassword />}
             </Layout>
           }
         ></Route>

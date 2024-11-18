@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { FaCartPlus } from "react-icons/fa";
 import "./Checkout.css";
 import { formatPrice } from "../../config/formatPrice.js";
 import { setShowToast } from "../../Slice/MyToastSlice";
-import { fetchAddOrder,clearAddOrder } from "../../Slice/userSlice";
+import { fetchAddOrder, clearAddOrder } from "../../Slice/userSlice";
 import { rgAddress, rgName, rgPhone, rgEmail } from "../../utils/regex";
 import Spinner from "../Spinner/Spinner.js";
+import {
+  fetchApplyDiscount,
+  clearApplyDiscount,
+  setCodeDiscount,
+  clearDiscount,
+} from "../../Slice/discountSlice";
+import { clearCart } from "../../Slice/cartSlice.js";
+import { fetchAllProducts } from "../../Slice/products";
+import axios from "../../config/configAxios.js";
+import { io } from "socket.io-client";
 const Checkout = React.memo(() => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -31,8 +40,6 @@ const Checkout = React.memo(() => {
   const [shipFee, setShipFee] = useState(0);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [isLoad, setLoad] = useState(true);
-  const [isToast, setToast] = useState(false);
-  const [currentDiscount, setCurrentDiscount] = useState(0);
   const [inputDiscount, setInputDiscount] = useState("");
   const userAddress = useSelector((state) => state.user.address);
   const dispatch = useDispatch();
@@ -44,6 +51,16 @@ const Checkout = React.memo(() => {
   const dataWards = useSelector((state) => state.address.wards);
   const [isChange, setIsChange] = useState(false);
   const userAddOrder = useSelector((state) => state.user.addOrder);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = io.connect(process.env.REACT_APP_API_URL);
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.close();
+    };
+  }, []);
 
   useEffect(() => {
     if (
@@ -83,11 +100,11 @@ const Checkout = React.memo(() => {
           setLoad(false);
           return;
         }
-       
       });
     }
   }, [userAddress.list, dataDistrict, dataProvince, dataWards]);
   useEffect(() => {
+    setShipFee(Province.code ? (Province.code === 79 ? 15000 : 35000) : null);
     if (Province.code && isChange) {
       setDistrict({
         code: null,
@@ -147,21 +164,36 @@ const Checkout = React.memo(() => {
     }
     dispatch(
       fetchAddOrder({
-        employeeId: null,
         fullname: `${firstName} ${lastName}`,
         phoneNumber: phoneNumber,
         email: email,
         address: `${detailAddress}, ${Ward.name}, ${District.name}, ${Province.name}`,
         products: productInCart,
         note: note,
-        discount: discount.negative,
-        shipFee: shipFee,
-        total: currentPrice,
+        id_coupon: discount.id,
       })
     );
+    socket.emit("newOrder");
+  };
+  const clearCartSystem = async () => {
+    setLoad(true);
+    await axios
+      .delete("/api/cart/clearCart")
+      .then((res) => {
+        setLoad(false);
+      })
+      .catch((err) => {
+        setLoad(false);
+      });
   };
   useEffect(() => {
     if (userAddOrder.error !== null) {
+      userAddOrder.error === 0 &&
+        dispatch(clearDiscount()) &&
+        dispatch(fetchAllProducts()) &&
+        dispatch(clearCart()) &&
+        clearCartSystem() &&
+        navigate("/");
       dispatch(
         setShowToast({
           show: true,
@@ -169,8 +201,7 @@ const Checkout = React.memo(() => {
           message: userAddOrder.message,
         })
       );
-      dispatch(clearAddOrder());  
-      userAddOrder.error === 0 && navigate("/");
+      dispatch(clearAddOrder());
     }
   }, [userAddOrder.error]);
   useEffect(() => {
@@ -181,8 +212,8 @@ const Checkout = React.memo(() => {
     setCurrentPrice(total);
   }, [productInCart]);
 
-  const checkDiscountValid = async () => {
-    if (discount == "") {
+  const checkDiscountValid = () => {
+    if (inputDiscount == "") {
       dispatch(
         setShowToast({
           show: true,
@@ -190,39 +221,46 @@ const Checkout = React.memo(() => {
           message: "Vui lòng nhập mã giảm giá",
         })
       );
-    } else {
-      let res = await axios.post(`/api/user/check-coupon`, {
-        coupon: inputDiscount.trim(),
-        value_apply: currentPrice,
-      });
-
-      if (res.status === 200) {
-        if (res.data[0]?.discount_value) {
-          const discountValue = parseFloat(
-            res.data[0].discount_value.replace("%", "")
-          );
-          const discountAmount = (currentPrice * discountValue) / 100;
-          setCurrentDiscount(discountAmount);
-          dispatch(
-            setShowToast({
-              show: true,
-              type: "success",
-              message: "Áp dụng mã giảm giá thành công",
-            })
-          );
-        } else {
-          dispatch(
-            setShowToast({
-              show: true,
-              type: "error",
-              message: res.data.message,
-            })
-          );
-        }
-      }
+      dispatch(clearDiscount());
+      return;
     }
+    dispatch(
+      fetchApplyDiscount({
+        coupon: inputDiscount,
+        value_apply: currentPrice,
+      })
+    );
   };
-
+  useEffect(() => {
+    if (discount.error !== null) {
+      dispatch(
+        setShowToast({
+          show: true,
+          type: discount.error === 1 ? "error" : "success",
+          message: discount.message,
+        })
+      );
+      discount.error === 0
+        ? dispatch(setCodeDiscount(inputDiscount))
+        : dispatch(clearDiscount());
+      dispatch(clearApplyDiscount());
+    }
+  }, [discount.error]);
+  useEffect(() => {
+    setInputDiscount(discount.code);
+  }, [discount.code]);
+  const carculatePrice = (price, discount, shipFee) => {
+    if (!discount) return price + shipFee;
+    return price - discountValue(price, discount) + shipFee;
+  };
+  const discountValue = (price, discount) => {
+    const discountValue = discount.replace("%", "");
+    return (price * discountValue) / 100;
+  };
+  const priceDiscount = useMemo(
+    () => carculatePrice(currentPrice, discount.value, shipFee),
+    [currentPrice, discount.value, shipFee]
+  );
   return (
     <div>
       {isLoad && <Spinner />}
@@ -505,7 +543,7 @@ const Checkout = React.memo(() => {
                       <img src={product.thumbnail} alt="" />
                     </div>
                     <Link
-                      to="/product/:product-id"
+                      to={`/product/${product.id}`}
                       className="w-[218px] font-semibold"
                     >
                       <p>{product.name}</p>
@@ -522,25 +560,24 @@ const Checkout = React.memo(() => {
                   </div>
                 ))}
               </div>
-              {discount?.code == "" && (
-                <div className="coupons border-gray-700 border-solid border p-1 rounded-sm w-[430px]">
-                  <input
-                    type="text"
-                    name=""
-                    id=""
-                    placeholder="Nhập mã giảm giá"
-                    onChange={(e) => setInputDiscount(e.target.value)}
-                    className="border-none outline-none w-[300px] px-2"
-                  />
-                  <button
-                    type="button"
-                    className="h-full w-28 bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200"
-                    onClick={checkDiscountValid}
-                  >
-                    Apply
-                  </button>
-                </div>
-              )}
+
+              <div className="coupons border-gray-700 border-solid border p-1 rounded-sm w-[430px]">
+                <input
+                  type="text"
+                  value={inputDiscount}
+                  placeholder="Nhập mã giảm giá"
+                  onChange={(e) => setInputDiscount(e.target.value)}
+                  className="border-none outline-none w-[300px] px-2"
+                />
+                <button
+                  type="button"
+                  className="h-full w-28 bg-orange-500 text-white p-2 font-bold hover:bg-slate-900 duration-200"
+                  onClick={checkDiscountValid}
+                >
+                  Apply
+                </button>
+              </div>
+
               <div className="mt-[20px] bg-[#ebebeb] p-5">
                 <p className="font-bold text-xl">Giá trị đơn hàng</p>
                 <div className="flex justify-between items-center">
@@ -552,9 +589,9 @@ const Checkout = React.memo(() => {
                   <span className="font-bold">
                     -{" "}
                     {formatPrice(
-                      discount.negative > 0
-                        ? discount.negative
-                        : currentDiscount
+                      discount.value
+                        ? discountValue(currentPrice, discount.value)
+                        : 0
                     )}
                   </span>
                 </div>
@@ -567,7 +604,7 @@ const Checkout = React.memo(() => {
                 <div className="flex justify-between items-center">
                   <p className="font-base text-slate-500">Tổng</p>
                   <span className="font-bold">
-                    {formatPrice(currentPrice + shipFee - currentDiscount)}
+                    {formatPrice(priceDiscount)}
                   </span>
                 </div>
               </div>
