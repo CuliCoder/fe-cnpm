@@ -621,6 +621,13 @@ const Checkout = React.memo(() => {
               <FaCartPlus className=" w-5 h-10 px-1" />
               ĐẶT HÀNG
             </button>
+            <button
+              onClick={() => {
+                socket.emit("newOrder");
+              }}
+            >
+              DONE
+            </button>
           </div>
         </div>
       </div>
