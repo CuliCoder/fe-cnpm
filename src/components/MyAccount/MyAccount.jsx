@@ -545,7 +545,7 @@ const MyAccount = React.memo(() => {
                       if (Date.parse(item.expiration_date) > Date.now()) {
                         return (
                           <div className="w-[350px] h-[150px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-md relative shadow-lg shadow-pink-400/50 text-center p-[4px]">
-                            <div className="ml-[300px]">
+                            <div className="absolute ml-[300px] top-0 right-2 z-0">
                               <img
                                 width="40"
                                 height="40"
@@ -553,13 +553,14 @@ const MyAccount = React.memo(() => {
                                 alt="discount"
                               />
                             </div>
-                            <p className="text-sm text-white">
+                            <p className="text-sm text-white mt-1 z-20">
                               Mã giảm giá được áp dụng cho tất cả sản phẩm
                             </p>
                             <p className="text-[20px] mt-1 font-bold">
                               {" "}
-                              {item.discount_value} Cho Giá Trị Hơn{" "}
-                              {formatPrice(item.value_apply)}
+                              {item.discount_value} Cho Giá Trị Từ{" "}
+                              {formatPrice(item.value_apply)} Đến{" "}
+                              {formatPrice(item.max_apply)}
                             </p>
                             <p className="font-semibold">
                               Mã: {item.coupon_code}{" "}
