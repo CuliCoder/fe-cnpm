@@ -38,7 +38,11 @@ export default function Register() {
       navigate("/login");
     }
   }, [registerUser.error]);
-
+  useEffect(() => {
+    return () => {
+      dispatch(clearState());
+    };
+  }, []);
   return (
     <div>
       {getCode.loading && <Spinner />}

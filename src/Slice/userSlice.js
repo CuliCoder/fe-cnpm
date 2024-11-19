@@ -163,7 +163,6 @@ export const fetchAddOrder = createAsyncThunk(
   "user/fetchAddOrder",
   async (
     {
-      employeeId,
       fullname,
       phoneNumber,
       email,
@@ -171,8 +170,6 @@ export const fetchAddOrder = createAsyncThunk(
       products,
       note,
       id_coupon,
-      shipFee,
-      total,
     },
     { _, rejectWithValue }
   ) => {

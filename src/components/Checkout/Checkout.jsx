@@ -56,7 +56,6 @@ const Checkout = React.memo(() => {
   useEffect(() => {
     const newSocket = io.connect(process.env.REACT_APP_API_URL);
     setSocket(newSocket);
-
     return () => {
       newSocket.close();
     };
@@ -102,6 +101,7 @@ const Checkout = React.memo(() => {
         }
       });
     }
+    setLoad(false);
   }, [userAddress.list, dataDistrict, dataProvince, dataWards]);
   useEffect(() => {
     setShipFee(Province.code ? (Province.code === 79 ? 15000 : 35000) : null);

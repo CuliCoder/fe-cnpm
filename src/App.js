@@ -49,6 +49,7 @@ function App() {
   const userchangeInfo = useSelector((state) => state.user.changeInfo);
   const usergetOrder = useSelector((state) => state.user.order);
   const usergetCoupon = useSelector((state) => state.user.coupon);
+  const [isLogin, setIsLogin] = useState(null);
   useEffect(() => {
     dispatch(check_status());
     dispatch(fetchAllProducts());
@@ -66,8 +67,9 @@ function App() {
     if (status.error === 1) {
       dispatch(clearCart());
     }
+    setIsLogin(status.error === 0 ? true : false);
   }, [status.error]);
-  if (status.error === null) {
+  if (isLogin === null) {
     return <Spinner />;
   }
   return (
