@@ -173,7 +173,6 @@ const Checkout = React.memo(() => {
         id_coupon: discount.id,
       })
     );
-    socket.emit("newOrder");
   };
   const clearCartSystem = async () => {
     setLoad(true);
@@ -188,13 +187,14 @@ const Checkout = React.memo(() => {
   };
   useEffect(() => {
     if (userAddOrder.error !== null) {
-      userAddOrder.error === 0 &&
-        dispatch(clearDiscount()) &&
-        dispatch(fetchAllProducts()) &&
-        dispatch(clearCart()) &&
-        clearCartSystem() &&
-        socket.emit("newOrder") &&
+      if (userAddOrder.error === 0) {
+        socket.emit("newOrder");
+        dispatch(clearDiscount());
+        dispatch(fetchAllProducts());
+        dispatch(clearCart());
+        clearCartSystem();
         navigate("/");
+      }
       dispatch(
         setShowToast({
           show: true,

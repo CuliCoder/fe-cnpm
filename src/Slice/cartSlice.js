@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../config/configAxios.js";
+import { clearState } from "./registerSlice.js";
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (_, rejectWithValue) => {
@@ -23,8 +24,8 @@ export const fetchAddToCart = createAsyncThunk(
         return {
           message: "Số lượng không hợp lệ",
           error: 1,
-        }
-      
+        };
+
       const response = await axios.post("/api/cart/addToCart", {
         id_product,
         quantity,
@@ -84,7 +85,6 @@ const cartSlice = createSlice({
       message: null,
       error: null,
     },
-
   },
   reducers: {
     addProduct: (state, action) => {
@@ -122,6 +122,12 @@ const cartSlice = createSlice({
     },
     clearCart: (state, action) => {
       state.getCart.items = [];
+    },
+    clearStateCart: (state) => {
+      state.addCart.error = null;
+      state.addCart.message = null;
+      state.removeCart.error = null;
+      state.removeCart.message = null;
     },
   },
   extraReducers: (builder) => {
@@ -184,5 +190,6 @@ export const {
   unincreaseQuantity,
   increaseQuantity,
   clearCart,
+  clearStateCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;

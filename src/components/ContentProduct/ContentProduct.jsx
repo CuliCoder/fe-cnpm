@@ -8,7 +8,7 @@ import { FaCartShopping } from "react-icons/fa6";
 import { useSelector, useDispatch } from "react-redux";
 import { addProduct } from "../../Slice/cartSlice";
 import { formatPrice } from "../../config/formatPrice";
-import { fetchAddToCart } from "../../Slice/cartSlice";
+import { fetchAddToCart, clearStateCart } from "../../Slice/cartSlice";
 import { setShowToast } from "../../Slice/MyToastSlice";
 import ProductList from "../Products/ProductList";
 import "./ContentProduct.css";
@@ -45,6 +45,7 @@ const ContentProduct = React.memo(() => {
         message: addToCart.message,
       })
     );
+    dispatch(clearStateCart());
   }, [addToCart.loading, addToCart.error]);
   const countPage = useMemo(
     () => Math.ceil(productlimit.length / 4),
