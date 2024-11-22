@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Sidebar, Button, Modal, Accordion, Badge } from "flowbite-react";
+import axios from "../../config/configAxios";
+import moment from "moment/moment";
+
+// Import ICON
 import { IoLocation } from "react-icons/io5";
 import { BiSolidCoupon } from "react-icons/bi";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
+import { AiOutlineFileProtect } from "react-icons/ai";
 import { HiArrowSmLeft, HiUser, HiViewBoards } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -28,7 +33,7 @@ import { fetchAddressWithId } from "../../Slice/userSlice";
 import { formatPrice } from "../../config/formatPrice";
 import "./MyAccount.css";
 import { handleCopyToClipboard } from "../../config/copyToClipboard";
-import { clearCart } from "../../Slice/cartSlice";
+import { IoIosArrowDown } from "react-icons/io";
 import { setShowToast } from "../../Slice/MyToastSlice";
 import FormAddAddress from "./FormAddAddress";
 import RadioAddress from "./RadioAddress";
@@ -53,6 +58,7 @@ const MyAccount = React.memo(() => {
   const [password, setPassword] = useState("");
   const [rePass1, setRePass1] = useState("");
   const [rePass2, setRePass2] = useState("");
+  const [openModalHistory, setOpenModalHistory] = useState(false);
   const userInfo = useSelector((state) => state.user.information);
   const allOrderUser = useSelector((state) => state.user.order);
   const userCoupon = useSelector((state) => state.user.coupon);
@@ -65,6 +71,8 @@ const MyAccount = React.memo(() => {
   const userCancelOrder = useSelector((state) => state.user.cancelOrder);
   const { setOpenConfirmModal } = useMyContext();
   const [seletedOrder, setSelectedOrder] = useState(null);
+  const [idTracking, setIdTracking] = useState(null);
+  const [ordertracking, setOrderTracking] = useState(null);
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -287,6 +295,27 @@ const MyAccount = React.memo(() => {
         return "info";
     }
   };
+
+  // Order Tracking
+  const selectOrderTracking = (id) => {
+    setIdTracking(id);
+    setOpenModalHistory(true);
+  };
+
+  const getTrackingOrder = async (id) => {
+    try {
+      const res = await axios.get(`/api/user/tracking-order/${id}`);
+      setOrderTracking(res.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (idTracking) {
+      getTrackingOrder(idTracking);
+    }
+  }, [idTracking]);
   return (
     <div>
       <ConfirmModal
@@ -514,6 +543,19 @@ const MyAccount = React.memo(() => {
                             >
                               {order.name}
                             </Badge>
+                            <button
+                              className=" flex items-center justify-center ml-[90%]"
+                              onClick={() => {
+                                selectOrderTracking(order.id);
+                              }}
+                            >
+                              <p className="text-[#f05252] text-sm">
+                                Xem thêm chi tiết
+                              </p>
+                              <span>
+                                <IoIosArrowDown fill="#f05252" />
+                              </span>
+                            </button>
                             <p className="text-x font-normal mt-5 ml-[70%]">
                               Phí vận chuyển:
                               {" " + formatPrice(order.shipFee)}
@@ -530,6 +572,163 @@ const MyAccount = React.memo(() => {
                       </Accordion.Panel>
                     ))}
                   </Accordion>
+                  {
+                    <Modal
+                      show={openModalHistory}
+                      onClose={() => {
+                        setOpenModalHistory(false);
+                        setIdTracking(null);
+                        setOrderTracking(null);
+                      }}
+                    >
+                      <Modal.Header>Theo dõi đơn hàng</Modal.Header>
+                      <Modal.Body className="">
+                        <div className="flex space-x-4">
+                          {ordertracking != null && (
+                            <section class="bg-white py-2 antialiased dark:bg-gray-900 ">
+                              <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+                                <h2 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                                  Lịch sử theo dõi đơn {ordertracking.id_order}
+                                </h2>
+
+                                <div class="mt-6 sm:mt-8 lg:flex lg:gap-8">
+                                  <div class="w-[40%] divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 dark:divide-gray-700 dark:border-gray-700 lg:max-w-xl xl:max-w-2xl">
+                                    <div class="p-6">
+                                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                                        Thông tin nhận hàng
+                                      </h3>
+                                      <div>
+                                        <div>
+                                          <p>Tên: </p>
+                                          <p>{ordertracking.name_user}</p>
+                                        </div>
+                                        <div>
+                                          <p>Số điện thoại: </p>{" "}
+                                          <p>{ordertracking.phone_number}</p>
+                                        </div>
+                                        <div>
+                                          <p>Địa chỉ: </p>{" "}
+                                          <p>{ordertracking.address}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div class="mt-6 grow sm:mt-8 lg:mt-0">
+                                    <div class="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                                      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                                        Lịch sử giao hàng
+                                      </h3>
+
+                                      <ol class="relative ms-3 border-s border-gray-200 dark:border-gray-700">
+                                        {ordertracking?.trackings?.map(
+                                          (item) => (
+                                            <li
+                                              class={`mb-10 ms-6 ${
+                                                item.id_status <
+                                                  ordertracking?.trackings[0]
+                                                    .id_status ||
+                                                item.id_status === 10
+                                                  ? "text-primary-700 dark:text-primary-500"
+                                                  : item.id_status <= 9 &&
+                                                    item.id_status >= 7
+                                                  ? "text-red-700 dark:text-red-500"
+                                                  : ""
+                                              }`}
+                                            >
+                                              {item.id_status <
+                                                ordertracking?.trackings[0]
+                                                  .id_status ||
+                                              item.id_status === 10 ? (
+                                                <span class="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 ring-8 ring-white dark:bg-primary-900 dark:ring-gray-800">
+                                                  <svg
+                                                    class="h-4 w-4"
+                                                    aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      stroke="currentColor"
+                                                      stroke-linecap="round"
+                                                      stroke-linejoin="round"
+                                                      stroke-width="2"
+                                                      d="M5 11.917 9.724 16.5 19 7.5"
+                                                    />
+                                                  </svg>
+                                                </span>
+                                              ) : (
+                                                <span class="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white dark:bg-gray-700 dark:ring-gray-800">
+                                                  <svg
+                                                    class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                                                    aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      stroke="currentColor"
+                                                      stroke-linecap="round"
+                                                      stroke-linejoin="round"
+                                                      stroke-width="2"
+                                                      d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5"
+                                                    />
+                                                  </svg>
+                                                </span>
+                                              )}
+
+                                              <h4
+                                                class={
+                                                  item.id_status <
+                                                    ordertracking?.trackings[0]
+                                                      .id_status ||
+                                                  item.id_status === 10
+                                                    ? "mb-0.5 text-base font-semibold"
+                                                    : item.id_status <= 9 &&
+                                                      item.id_status >= 7
+                                                    ? "mb-0.5 text-base font-semibold text-red-900 dark:text-white"
+                                                    : "mb-0.5 text-base font-semibold text-gray-900 dark:text-white"
+                                                }
+                                              >
+                                                Lúc{" "}
+                                                {moment(item.time).format(
+                                                  "hh:mm:ss DD/MM/YYYY"
+                                                )}
+                                              </h4>
+                                              <p
+                                                class={
+                                                  item.id_status <
+                                                    ordertracking?.trackings[0]
+                                                      .id_status ||
+                                                  item.id_status === 10
+                                                    ? "text-sm font-normal"
+                                                    : item.id_status <= 9 &&
+                                                      item.id_status >= 7
+                                                    ? "text-sm font-normal text-red-500 dark:text-gray-400"
+                                                    : "text-sm font-normal text-gray-500 dark:text-gray-400"
+                                                }
+                                              >
+                                                {item.name_status}
+                                              </p>
+                                            </li>
+                                          )
+                                        )}
+                                      </ol>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </section>
+                          )}
+                        </div>
+                      </Modal.Body>
+                      <Modal.Footer></Modal.Footer>
+                    </Modal>
+                  }
                 </div>
               ))}
 
