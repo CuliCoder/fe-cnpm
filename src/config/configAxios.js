@@ -71,7 +71,7 @@ instance.interceptors.response.use(
           .catch((error) => {
             processQueue(error);
             reject(error);
-            window.location.href = "/";
+            // window.location.href = "/";
           })
           .finally(() => {
             isRefreshing = false;
