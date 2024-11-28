@@ -49,6 +49,7 @@ function App() {
   const userchangeInfo = useSelector((state) => state.user.changeInfo);
   const usergetOrder = useSelector((state) => state.user.order);
   const usergetCoupon = useSelector((state) => state.user.coupon);
+  const uesrgetInfo = useSelector((state) => state.user.information);
   const [isLogin, setIsLogin] = useState(null);
   useEffect(() => {
     dispatch(check_status());
@@ -88,6 +89,7 @@ function App() {
         userchangeInfo.loading ||
         usergetOrder.loading ||
         usergetCoupon.loading ||
+        uesrgetInfo.loading ||
         addCart.loading) && <Spinner />}
       <Routes>
         <Route

@@ -71,7 +71,7 @@ instance.interceptors.response.use(
           .catch((error) => {
             processQueue(error);
             reject(error);
-            // window.location.href = "/";
+            window.location.href = "/";
           })
           .finally(() => {
             isRefreshing = false;
@@ -79,7 +79,7 @@ instance.interceptors.response.use(
       });
     }
     if (error.response.data.code === 2) {
-      // window.location.href = "/";
+      window.location.href = "/";
     }
     return Promise.reject(error);
   }
