@@ -46,7 +46,7 @@ export default function SearchProduct() {
               <Link to="/products">Cửa hàng</Link>
             </Breadcrumb.Item>
             <Breadcrumb.Item>
-              <div className="font-bold text-gray-800">{`Kết quả tìm kiếm cho ${valueSearch}`}</div>{" "}
+              <div className="font-bold text-gray-800">{`Kết quả tìm kiếm cho ${valueSearch.replaceAll("-", " ")}`}</div>{" "}
             </Breadcrumb.Item>
           </div>
         </div>
