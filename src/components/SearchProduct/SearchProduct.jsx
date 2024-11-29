@@ -18,7 +18,7 @@ export default function SearchProduct() {
   useEffect(() => {
     if (products && products.length > 0) {
       let productSearch = products.filter((product) =>
-        product.title.toLowerCase().includes(valueSearch)
+        product.title.toLowerCase().includes(valueSearch.replaceAll("-", " "))
       );
       setProductBySearch(productSearch);
     }
