@@ -106,20 +106,6 @@ export default function Login() {
             value={showPassword}
             onChange={() => setShowPassword((prev) => !prev)}
           />
-
-          <input
-            type="checkbox"
-            name=""
-            id="save-account"
-            className="focus:border-none focus:ring-0"
-          />
-          <label
-            htmlFor="save-account"
-            className="text-black font-thin ml-1 focus:outline-0"
-          >
-            Lưu tài khoản trên thiết bị này
-          </label>
-
           <Link to="/recover-password">
             <p className="text-orange-500 font-thin mt-8">Quên mật khẩu?</p>
           </Link>
